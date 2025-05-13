@@ -6,7 +6,7 @@ import Home from './routes/Home';
 import About from './routes/About';
 import Header from './components/Header';
 import Katalog from './routes/Katalog'
-
+import Footer from './components/Footer';
 function App() {
   return (
     <Router>
@@ -16,6 +16,7 @@ function App() {
         <Route path="/About" element={<About />} />
         <Route path="/Katalog" element={<Katalog />} />
       </Routes>
+      <Footer />
     </Router>
   );
 }
