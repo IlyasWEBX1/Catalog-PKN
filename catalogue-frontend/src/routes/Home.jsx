@@ -4,6 +4,7 @@ import '../App.css';
 function Home() {
   return (
       <div className="Home">
+      <div className="flex flex-col min-h-screen">
       <section class="bg-gray-100 py-16">
           <div class="max-w-6xl mx-auto px-4 text-center">
             <h1 class="text-4xl font-bold text-gray-800 mb-4">Discover Our Collection</h1>
@@ -60,6 +61,7 @@ function Home() {
             </div>
           </div>
         </section>
+      </div>
       </div>
   );
 }
