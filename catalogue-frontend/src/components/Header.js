@@ -4,10 +4,9 @@ import LOGO from '../assets/images/LOGO.png';
 
 function Header(){
   return (
-    <header className='flex justify-between items-center p-4 bg-orange-800 font-system'>
-      <div className='text-blue px-50'><img src={LOGO} className='w-32 h-32'></img></div>
-      
-      <nav className="flex self-end gap-4 text-white text-3xl">
+    <header className='flex justify-between items-center p-4 bg-orange-800 font-system w-full overflow-x-hidden'>
+      <div className='mb-4 md:mb-0'><img src={LOGO} className='w-32 h-32'></img></div>
+      <nav className="flex flex-col md:flex-row gap-2 md:gap-4 text-white text-2xl items-center self-end">
         <Link className="px-4" to="/">Home</Link>
         <Link className="px-4" to="/About">Tentang Kami</Link>
         <Link className="px-4" to="/Katalog">Katalog</Link>
