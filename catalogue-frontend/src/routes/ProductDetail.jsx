@@ -16,7 +16,7 @@ function ProductDetail() {
     return <p className="text-center mt-8">Loading...</p>;
   }
 
-  return (
+  return ( 
     <section className="py-20 px-4 min-h-screen shadow-lg">
       <div className="max-w-7xl mx-auto mt-10 h-full">
         <div className="flex flex-col lg:flex-row gap-8 shadow-lg rounded-md">
@@ -53,14 +53,6 @@ function ProductDetail() {
                 <p className="text-gray-700 mb-4">
                   {product.deskripsi}
                 </p>
-
-                <h4 className="font-medium">Key Features:</h4>
-                <ul className="list-disc list-inside text-gray-700 space-y-1">
-                  <li><strong>Active Noise Cancellation:</strong> Block out external noise...</li>
-                  <li><strong>High-Quality Sound:</strong> 40mm dynamic drivers...</li>
-                  <li><strong>Long Battery Life:</strong> Up to 30 hours playback...</li>
-                  {/* ... */}
-                </ul>
               </div>
             </div>
           </div>

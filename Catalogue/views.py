@@ -4,6 +4,7 @@ from rest_framework import status, generics, viewsets
 from django.shortcuts import render
 from .models import Produk, Kategori, Pesan, User
 from .serializers import ProdukSerializer, KategoriSerializer, UserSerializer, PesanSerializer
+from rest_framework.permissions import IsAuthenticated
 
 class ProdukViewSet(viewsets.ModelViewSet):
     queryset = Produk.objects.all()
@@ -16,6 +17,11 @@ class KategoriViewSet(viewsets.ModelViewSet):
 class PesanViewSet(viewsets.ModelViewSet):
     queryset = Pesan.objects.all()
     serializer_class = PesanSerializer
+    permission_classes = [IsAuthenticated] 
+    
+    def perform_create(self, serializer):
+        # Automatically set the `user` field to the currently logged-in user
+        serializer.save(user=self.request.user)
 
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()

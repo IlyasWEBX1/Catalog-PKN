@@ -2,7 +2,7 @@ function Footer(){
     return(
         <footer className="bg-white rounded-xl shadow-sm m-2 dark:bg-gray-800">
         <div className="p-4 bg-orange-800 text-white">
-            <div className="flex flex-wrap items-center">
+            <div className="flex flex-wrap items-center space-y-2">
                 <div className="footer-column">
                     <h3>Shop</h3>
                     <ul className="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
@@ -14,14 +14,14 @@ function Footer(){
                 </div>
                 <div className="footer-column">
                     <h3>Information</h3>
-                    <ul className="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
+                    <ul className="flex md:flex-row sm:flex-col items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
                         <li><a href="#" className="hover:underline me-4 md:me-6">About Us</a></li>
                         <li><a href="#" className="hover:underline me-4 md:me-6">Contact Us</a></li>
                         <li><a href="#" className="hover:underline me-4 md:me-6">Terms &amp; Conditions</a></li>
                         <li><a href="#" className="hover:underline me-4 md:me-6">Privacy Policy</a></li>
                     </ul>
                     </div>
-                <div className="footer-column">
+                <div className="footer-column mr-96">
                     <h3>Customer Service</h3>
                     <ul className="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
                         <li><a href="#" className="hover:underline me-4 md:me-6">FAQ</a></li>

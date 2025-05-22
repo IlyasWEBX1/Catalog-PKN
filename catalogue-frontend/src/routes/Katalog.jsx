@@ -35,10 +35,10 @@ function Katalog() {
             return matchesName && matchesType
     });
     return (
-        <div className="min-h-screen font-system">
+        <div className="min-h-screen font-system mt-5">
         <section className="bg-gray-100 py-16">
             <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold">Katalog</h2>
+                <h2 className="text-5xl font-bold">Katalog</h2>
             </div>
             <div className="flex-1 flex justify-center px-4">
             <input

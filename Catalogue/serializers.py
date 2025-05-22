@@ -15,6 +15,7 @@ class PesanSerializer(serializers.ModelSerializer):
     class Meta:
         model = Pesan
         fields = '__all__'
+        read_only_fields = ('user',)
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
