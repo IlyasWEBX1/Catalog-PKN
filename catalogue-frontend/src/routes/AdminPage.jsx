@@ -23,6 +23,8 @@ function AdminPage() {
   const [newStock, setNewStock] = useState('');
   const [newCategory, setNewCategory] = useState('');
   const [newDesc, setNewDesc] = useState('');
+  const [newImage, setNewImage] = useState(null);
+  const [editedImage, setEditedImage] = useState(null);
   const refreshProducts = () => {
   Promise.all([axios.get('http://127.0.0.1:8000/Catalogue_api/produk/'), 
     axios.get('http://127.0.0.1:8000/Catalogue_api/kategori/'),
@@ -75,34 +77,39 @@ const handleDeletePesan = (id) => {
     setEditedStock(product.stok);
     setEditedCategory(product.kategori)
     setEditedDesc(product.deskripsi)
+    setEditedImage(product.gambar)
   };
-    const handleEditCategory = (category) => {
+  const handleEditCategory = (category) => {
     setEditingCategoryId(category.id);
     setEditedCategoryName(category.nama);
   };
  const handleUpdate = (e) => {
   e.preventDefault();
 
-  axios.put(
-    `http://127.0.0.1:8000/Catalogue_api/produk/${editingId}/`,
-    {
-      nama: editedName,
-      harga: editedPrice,
-      kategori: EditedCategory,
-      deskripsi: editedDesc,
-      stok: editedStock
+  const formData = new FormData();
+  formData.append('nama', editedName);
+  formData.append('harga', editedPrice);
+  formData.append('kategori', EditedCategory);
+  formData.append('deskripsi', editedDesc);
+  formData.append('stok', editedStock);
 
-      // gambar: not included
+  // Tambahkan gambar hanya jika ada yang baru dipilih
+  if (editedImage) {
+    formData.append('gambar', editedImage);
+  }
+
+  axios.put(`http://127.0.0.1:8000/Catalogue_api/produk/${editingId}/`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${token}`,
     },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  ).then(() => {
+  })
+  .then(() => {
     setEditingId(null);
+    setEditedImage(null);  // reset gambar setelah update
     refreshProducts();
-  }).catch(err => {
+  })
+  .catch(err => {
     console.error('Update failed:', err.response?.data || err);
   });
 };
@@ -129,28 +136,32 @@ const handleDeletePesan = (id) => {
 
 const handleAddProduct = (e) => {
   e.preventDefault();
-  axios.post(
-    'http://127.0.0.1:8000/Catalogue_api/produk/',
-    {
-      nama: newName,
-      harga: newPrice,
-      stok: newStock,
-      kategori: newCategory,
-      deskripsi: newDesc,
+  const formData = new FormData();
+  formData.append('nama', newName);
+  formData.append('harga', newPrice);
+  formData.append('stok', newStock);
+  formData.append('kategori', newCategory);
+  formData.append('deskripsi', newDesc);
+  if (newImage) {
+    formData.append('gambar', newImage); // 'gambar' harus sesuai dengan nama field di model Django
+  }
+
+  axios.post('http://127.0.0.1:8000/Catalogue_api/produk/', formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      Authorization: `Bearer ${token}`,
     },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  ).then(() => {
+  })
+  .then(() => {
     setNewName('');
     setNewPrice('');
     setNewStock('');
     setNewCategory('');
     setNewDesc('');
+    setNewImage(null);
     refreshProducts();
-  }).catch(err => {
+  })
+  .catch(err => {
     console.error('Add product failed:', err.response?.data || err);
   });
 };
@@ -330,7 +341,16 @@ const handleConfirm = (produkId, pesanId) => {
                     className="border px-2 py-1 rounded w-full"
                   />
                 </div>
-
+                <div>
+                  <label htmlFor="image" className="block mb-1 font-semibold">Gambar Baru (Opsional):</label>
+                  <input
+                    id="image"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => setEditedImage(e.target.files[0])}
+                    className="border px-2 py-1 rounded w-full"
+                  />
+                </div>
                 <div>
                   <label htmlFor="category-select" className="block mb-1 font-semibold">Kategori :</label>
                   <select
@@ -484,6 +504,12 @@ const handleConfirm = (produkId, pesanId) => {
               onChange={(e) => setNewStock(e.target.value)}
               className="border px-2 py-1 rounded w-full"
               required
+            />
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => setNewImage(e.target.files[0])}
+              className="border px-2 py-1 rounded w-full"
             />
             <select
               value={newCategory}
