@@ -19,10 +19,19 @@ from django.urls import path, include
 from Catalogue import urls as api_urls
 from django.conf import settings
 from django.conf.urls.static import static
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+from Catalogue.views import MyTokenObtainPairView
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('Catalogue_api/', include(api_urls)),
+    path('Catalogue_api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),   # login
+    path('Catalogue_api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), 
+ 
 ]
 
 if settings.DEBUG:

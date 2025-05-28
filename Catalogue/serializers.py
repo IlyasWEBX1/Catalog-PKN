@@ -1,11 +1,14 @@
 from rest_framework import serializers
 from .models import Produk, Kategori, Pesan, User
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class ProdukSerializer(serializers.ModelSerializer):
     class Meta:
         model = Produk
         fields = '__all__'
-
+        extra_kwargs = {
+            'gambar': {'required': False, 'allow_null': True},
+        }
 class KategoriSerializer(serializers.ModelSerializer):
     class Meta:
         model = Kategori
@@ -22,4 +25,10 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
+class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+        token['peran'] = user.peran  # Add role to token
+        return token
 

@@ -49,7 +49,7 @@ function Home() {
         <div className="flex flex-wrap flex-col md:flex-row justify-center gap-2">
           {categorizedProducts.map((product) => (
             <div key={product.id} className="bg-gray-50 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition w-full max-w-sm">
-              <img src={product.gambar} alt={product.kategori} className="w-full h-48 object-cover" />
+              <img src={`http://localhost:8000${product.gambar}`} alt={product.kategori} className="w-full h-48 object-cover" />
               <div className="p-4 text-center">
                 <h3 className="text-xl font-semibold text-gray-800">{product.nama}</h3>
                 <Link to='/Katalog' className="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">
@@ -72,7 +72,7 @@ function Home() {
         <div className="flex md:flex-col lg:flex-row justify-center md:items-center gap-2">
           {products.map((product) => (
             <div key={product.id} className="bg-gray-50 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition w-full max-w-sm">
-              <img src={product.gambar} alt={product.kategori} className="w-full h-48 object-cover" />
+              <img src={`http://localhost:8000${product.gambar}`} alt={product.kategori} className="w-full h-48 object-cover" />
               <div className="p-4 text-center">
                 <h3 className="text-xl font-semibold text-gray-800">{product.nama}</h3>
                 <Link to={`/ProductDetail/${product.id}`} className="inline-block bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition">

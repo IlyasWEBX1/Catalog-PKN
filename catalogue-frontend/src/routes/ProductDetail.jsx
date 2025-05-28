@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-function ProductDetail() {
+function ProductDetail({}) {
+  const user_id = null;
   const { id } = useParams();
   const [product, setProduct] = useState(null);
 
@@ -11,10 +12,22 @@ function ProductDetail() {
       .then((response) => setProduct(response.data))
       .catch((error) => console.error('Error fetching product:', error));
   }, [id]);
+  const handleChat = async () => {
+  const message = `Hello, I have a question about ${product.nama}.`;
 
+  await axios.post('http://localhost:8000/Catalogue_api/send-message/', {
+    product_id: product.id,
+    message: message,
+    user_id: null  // if user is authenticated
+  });
+
+  // After saving, open WhatsApp
+  window.open(`https://wa.me/6285877064835?text=${encodeURIComponent(message)}`, "_blank");
+};
   if (!product) {
     return <p className="text-center mt-8">Loading...</p>;
   }
+  
 
   return ( 
     <section className="py-20 px-4 min-h-screen shadow-lg">
@@ -43,11 +56,11 @@ function ProductDetail() {
                 </div>
             {/* Tabs */}
             <div className="mt-6">
-               <a
+               <button  onClick={handleChat}
                         href={`https://wa.me/6285877064835?text=${encodeURIComponent(`Hello, I have a question about ${product.nama}.`)}`}
                         className="inline-block mt-4 px-4 py-2 bg-orange-800 text-white rounded hover:bg-orange-700"
                 >
-                Chat with us</a>
+                Chat with us</button>
               <div className="mt-4 mb-6">
                 <h3 className="text-lg font-semibold mb-2">Deskripsi Produk</h3>
                 <p className="text-gray-700 mb-4">

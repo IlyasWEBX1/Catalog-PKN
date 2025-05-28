@@ -73,7 +73,7 @@ function Katalog() {
                 <div className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transition delay-50 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110">
                     <div className="h-48 overflow-hidden">
                     <img
-                        src={product.gambar}
+                        src={`http://localhost:8000${product.gambar}`}
                         alt={product.title}
                         className="w-full h-full object-cover"
                     />
