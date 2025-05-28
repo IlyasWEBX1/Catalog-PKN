@@ -90,3 +90,19 @@ def send_message(request):
     )
 
     return Response({"message": "Pesan created", "laporan_id": laporan.id})
+
+@api_view(['POST'])
+def kurangi_stok(request, pk, pesan_id):
+    try:
+        pesan = Pesan.objects.get(id=pesan_id)
+        produk = Produk.objects.get(pk=pk)
+        if produk.stok > 0:
+            produk.stok -= 1
+            produk.save()
+            pesan.delete()
+            return Response({'message': 'Stok dikurangi'}, status=status.HTTP_200_OK)
+        return Response({'message': 'Stok sudah habis'}, status=status.HTTP_400_BAD_REQUEST)
+    except Produk.DoesNotExist:
+        return Response({'message': 'Produk tidak ditemukan'}, status=status.HTTP_404_NOT_FOUND)
+    except Pesan.DoesNotExist:
+        return Response({'message': 'Pesan tidak ditemukan'}, status=status.HTTP_404_NOT_FOUND)

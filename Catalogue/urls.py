@@ -1,7 +1,7 @@
 from rest_framework import routers
 from .views import KategoriViewSet, ProdukDetail, UserViewSet, PesanViewSet, UserDetail
 from django.urls import path, include
-from .views import ProdukList, send_message
+from .views import ProdukList, send_message, kurangi_stok
 
 
 
@@ -17,4 +17,5 @@ urlpatterns = [
     path('produk/<int:pk>/', ProdukDetail.as_view(), name='product-detail'),
     path('user/<int:pk>/', UserDetail.as_view(), name='product-detail'),
     path('send-message/', send_message, name='send_message'),
+    path('kurangi-stok/<int:pk>/<int:pesan_id>', kurangi_stok),
 ]

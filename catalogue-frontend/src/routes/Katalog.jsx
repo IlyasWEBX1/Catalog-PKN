@@ -11,6 +11,8 @@ function Katalog() {
     const [searchQuery, setSearchQuery] = useState("");
     const [selectedType, setSelectedType] = useState("All");
     const [categories, setCategories] = useState([]);
+    const [minPrice, setMinPrice] = useState("");
+    const [maxPrice, setMaxPrice] = useState("");
 
     useEffect(() => {
         Promise.all([
@@ -32,7 +34,9 @@ function Katalog() {
             const matchedCategory = categories.find(cat => cat.id === product.kategori);
             const categoryNama = matchedCategory ? matchedCategory.nama : "";
             const matchesType = selectedType === "All" || selectedType === categoryNama
-            return matchesName && matchesType
+            const matchesMinPrice = !minPrice || product.harga >= minPrice
+            const matchesMaxPrice = !maxPrice || product.harga <= maxPrice
+            return matchesName && matchesType && matchesMaxPrice && matchesMinPrice
     });
     return (
         <div className="min-h-screen font-system mt-5">
@@ -40,13 +44,27 @@ function Katalog() {
             <div className="text-center mb-12">
                 <h2 className="text-5xl font-bold">Katalog</h2>
             </div>
-            <div className="flex-1 flex justify-center px-4">
+            <div className="flex-1 gap-2 flex justify-center px-4 py-4">
             <input
                 type="text"
                 placeholder="Search..."
                 className="w-full max-w-md px-4 py-2 rounded-md border border-white focus:outline-none focus:ring-2 focus:ring-white"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <input
+                type="number"
+                placeholder="Min Price"
+                className="px-2 py-2 rounded-md border focus:outline-none"
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+            />
+            <input
+                type="number"
+                placeholder="Max Price"
+                className="px-2 py-2 rounded-md border focus:outline-none"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
             />
             </div>
              <div className="flex flex-wrap justify-center gap-2">

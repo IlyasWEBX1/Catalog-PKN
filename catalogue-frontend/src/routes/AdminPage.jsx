@@ -7,6 +7,7 @@ function AdminPage() {
   const token = localStorage.getItem('authToken');
   const [products, setProducts] = useState([])
   const [messages, setMessages] = useState([])
+  const [users, setUsers] = useState([])
   const [editingId, setEditingId] = useState(null);
   const [editingCategoryId, setEditingCategoryId] = useState(null);
   const [editedCategoryName, setEditedCategoryName] = useState("");
@@ -25,11 +26,15 @@ function AdminPage() {
   const refreshProducts = () => {
   Promise.all([axios.get('http://127.0.0.1:8000/Catalogue_api/produk/'), 
     axios.get('http://127.0.0.1:8000/Catalogue_api/kategori/'),
-  axios.get('http://127.0.0.1:8000/Catalogue_api/pesan/')])
-    .then(([res, res2, res3]) => {
+  axios.get('http://127.0.0.1:8000/Catalogue_api/pesan/'),
+    axios.get('http://127.0.0.1:8000/Catalogue_api/user/'),
+])
+    .then(([res, res2, res3, res4]) => {
       setProducts(res.data) 
       setCategories(res2.data)
-      setMessages(res3.data)})
+      setMessages(res3.data)
+      setUsers(res4.data)
+    })
     .catch((err) => console.log("Error:", err));
 };
   useEffect(()=> {
@@ -46,6 +51,15 @@ function AdminPage() {
 };
  const handleDeleteCategory = (id) => {
   axios.delete(`http://127.0.0.1:8000/Catalogue_api/kategori/${id}/`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  .then(() => refreshProducts())
+  .catch((err) => console.error('Delete error:', err));
+};
+const handleDeletePesan = (id) => {
+  axios.delete(`http://127.0.0.1:8000/Catalogue_api/pesan/${id}/`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -162,6 +176,17 @@ const handleAddCategory = (e) => {
   }).catch(err => {
     console.error('Add product failed:', err.response?.data || err);
   });
+};
+const handleConfirm = (produkId, pesanId) => {
+  axios.post(`http://127.0.0.1:8000/Catalogue_api/kurangi-stok/${produkId}/${pesanId}`)
+    .then(() => {
+      // Fetch both updated products and messages
+      refreshProducts()
+    })
+    .catch(err => {
+      console.error('Error:', err);
+      alert('Gagal mengurangi stok');
+    });
 };
   return (
     <div className="min-h-screen bg-gray-100 p-8">
@@ -369,9 +394,50 @@ const handleAddCategory = (e) => {
             </form>
           </div>
         <div className="bg-white p-6 rounded shadow">
-          <h2 className="text-xl font-semibold mb-2">User Overview</h2>
-          <p className="text-gray-700">View user data, roles, or activity logs.</p>
+          <h2 className="text-xl font-semibold mb-2">Manage Messages</h2>
+          <p className="text-gray-700">View Messages and confirm order.</p>
           {/* Add user-related actions here */}
+          <div className="overflow-x-auto">
+          <table className="min-w-full table-auto border-collapse border border-gray-300">
+            <thead className="bg-orange-800 text-white">
+              <tr>
+                <th className="border px-4 py-2">No</th>
+                <th className="border px-4 py-2">User</th>
+                <th className="border px-4 py-2">Produk</th>
+                <th className="border px-4 py-2">Laporan</th>
+                <th className="border px-4 py-2">Isi Pesan</th>
+                <th className="border px-4 py-2">Waktu</th>
+                 <th className="border px-4 py-2">Confirmation</th>
+              </tr>
+            </thead>
+            <tbody>
+              {messages.map((pesan, index) => (
+                <tr key={index} className="hover:bg-gray-100">
+                  <td className="border px-4 py-2 text-center">{pesan.id}</td>
+                  <td className="border px-4 py-2">{users.find((user)=>user.id === pesan.user)?.nama || "Uknown"}</td>
+                  <td className="border px-4 py-2">{products.find((product) => product.id === pesan.produk)?.nama || "Unknown"}</td>
+                  <td className="border px-4 py-2">{pesan.laporan}</td>
+                  <td className="border px-4 py-2">{pesan.isi_pesan}</td>
+                  <td className="border px-4 py-2">{new Date(pesan.waktu).toLocaleString("id-ID")}</td>
+                  <td className="border px-4 py-2 flex flex-row gap-2">
+                    <button
+                      onClick={() => handleConfirm(pesan.produk, pesan.id)}
+                      className="px-2 py-1 bg-green-500 text-white rounded"
+                    >
+                      Confirm
+                    </button>
+                    <button
+                      onClick={() => handleDeletePesan(pesan.id)}
+                      className="px-2 py-1 bg-red-500 text-white rounded"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         </div>
         <div className="bg-white p-6 rounded shadow mt-6">
           <h2 className="text-xl font-semibold mb-2">Add New Category</h2>
