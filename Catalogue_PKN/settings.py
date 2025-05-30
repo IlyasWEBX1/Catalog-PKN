@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-v9oa8480(ind8hkw=*@f-%5fcp!d$d)^kr2&bv+masw7ca&gul
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -55,6 +55,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'corsheaders.middleware.CorsMiddleware'
 ]
+# Whitenoise
+MIDDLEWARE.insert(1, "whitenoise.middleware.WhiteNoiseMiddleware")
 
 ROOT_URLCONF = 'Catalogue_PKN.urls'
 CORS_ALLOW_ALL_ORIGINS = True  # untuk pengujian lokal
