@@ -16,6 +16,7 @@ from rest_framework_simplejwt.views import (
 class KategoriViewSet(viewsets.ModelViewSet):
     queryset = Kategori.objects.all()
     serializer_class = KategoriSerializer
+    permission_classes = [IsAdmin]
 
 class PesanViewSet(viewsets.ModelViewSet):
     queryset = Pesan.objects.all()
@@ -27,6 +28,7 @@ class PesanViewSet(viewsets.ModelViewSet):
         serializer.save(user=self.request.user)
 
 class UserViewSet(viewsets.ModelViewSet):
+    permission_classes = [IsAdmin]
     queryset = User.objects.all()
     serializer_class = UserSerializer
 

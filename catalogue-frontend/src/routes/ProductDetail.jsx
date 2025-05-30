@@ -19,16 +19,22 @@ function ProductDetail({}) {
   }, [id]);
   const handleChat = async () => {
 
-  await axios.post('http://localhost:8000/Catalogue_api/send-message/', {
-    product_id: product.id,
-    message: message,
-    user_id: null  // if user is authenticated
-  });
+  try {
+    await axios.post('http://localhost:8000/Catalogue_api/send-message/', {
+      product_id: product.id,
+      message: message,
+      user_id: null 
+    });
 
-  setShowModal(false);
+    setShowModal(false);
 
-  // After saving, open WhatsApp
-  window.open(`https://wa.me/6285877064835?text=${encodeURIComponent(message)}`, "_blank");
+    // Buka WhatsApp hanya jika penyimpanan berhasil
+    window.open(`https://wa.me/6285877064835?text=${encodeURIComponent(message)}`, "_blank");
+
+  } catch (err) {
+    console.error("Gagal mengirim pesan:", err);
+    alert("Gagal mengirim pesan. Silakan coba lagi.");
+  }
 };
   if (!product) {
     return <p className="text-center mt-8">Loading...</p>;

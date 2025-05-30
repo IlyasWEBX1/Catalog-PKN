@@ -94,48 +94,6 @@ function Contact(){
                     </div>
                 </div>
             </section>
-            <section className='mb-12'>
-                <div className="flex flex-col justify-center items-center max-w-6xl mx-auto px-4">
-                    <h2 className="text-3xl font-bold text-center mb-2">Send Us a Message</h2>
-                    <div className='w-24 h-1 bg-orange-600 mx-auto mt-2 mb-12'></div>
-                    <div className="bg-white-600 rounded-lg h-full w-1/2 shadow-lg">
-                        <form className="p-[30px]" onSubmit={handleSubmit}>
-              <div className="mb-6">
-                <label htmlFor="isi_pesan" className="block mb-2 font-semibold text-gray-700">Message</label>
-                <textarea
-                  id="isi_pesan"
-                  name="isi_pesan"
-                  value={formData.isi_pesan}
-                  onChange={handleChange}
-                  rows="4"
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  required
-                />
-              </div>
-
-              <div className="mb-6">
-                <label htmlFor="waktu" className="block mb-2 font-semibold text-gray-700">Time</label>
-                <input
-                  type="datetime-local"
-                  id="waktu"
-                  name="waktu"
-                  value={formData.waktu}
-                  onChange={handleChange}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg"
-                  required
-                />
-              </div>
-
-              <button
-                type="submit"
-                className="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
-              >
-                Submit
-              </button>
-            </form>
-                    </div>
-                </div>
-            </section>
             </div>
         </div>
        

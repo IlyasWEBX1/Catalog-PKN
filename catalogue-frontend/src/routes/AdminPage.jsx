@@ -94,11 +94,11 @@ const handleDeletePesan = (id) => {
   formData.append('stok', editedStock);
 
   // Tambahkan gambar hanya jika ada yang baru dipilih
-  if (editedImage) {
-    formData.append('gambar', editedImage);
-  }
+ if (editedImage && editedImage instanceof File && editedImage.size > 0) {
+  formData.append('gambar', editedImage);
+}
 
-  axios.put(`http://127.0.0.1:8000/Catalogue_api/produk/${editingId}/`, formData, {
+  axios.patch(`http://127.0.0.1:8000/Catalogue_api/produk/${editingId}/`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
       Authorization: `Bearer ${token}`,

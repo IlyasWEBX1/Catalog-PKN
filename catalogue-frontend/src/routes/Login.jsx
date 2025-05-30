@@ -24,7 +24,12 @@ function LoginPage() {
           navigate('/'); // Redirect to user homepage
         }
       })
-      .catch(() => alert('Login failed'));
+      .catch(err => {
+        if (err.response?.status === 401) {
+          alert('Username or password incorrect.');
+        } else {
+          alert('Something went wrong. Please try again.');
+        }});
   };
   const handleGuestLogin = () => {
     axios.post('http://localhost:8000/Catalogue_api/token/', {

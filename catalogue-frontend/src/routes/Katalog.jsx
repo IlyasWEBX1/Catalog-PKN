@@ -34,8 +34,8 @@ function Katalog() {
             const matchedCategory = categories.find(cat => cat.id === product.kategori);
             const categoryNama = matchedCategory ? matchedCategory.nama : "";
             const matchesType = selectedType === "All" || selectedType === categoryNama
-            const matchesMinPrice = !minPrice || product.harga >= minPrice
-            const matchesMaxPrice = !maxPrice || product.harga <= maxPrice
+            const matchesMinPrice = !minPrice || product.harga >= Number(minPrice)
+            const matchesMaxPrice = !maxPrice || product.harga <= Number(maxPrice)
             return matchesName && matchesType && matchesMaxPrice && matchesMinPrice
     });
     return (

@@ -46,7 +46,7 @@ function Home() {
           <h2 className="text-3xl font-semibold text-gray-800 mb-2">Our Categories</h2>
           <p className="text-gray-600">Browse through our diverse categories and find exactly what you need.</p>
         </div>
-        <div className="flex flex-wrap flex-col md:flex-row justify-center gap-2">
+        <div className="flex flex-wrap flex-col md:flex-row justify-center items-center gap-2">
           {categorizedProducts.map((product) => (
             <div key={product.id} className="bg-gray-50 rounded-lg shadow-md overflow-hidden hover:shadow-xl transition w-full max-w-sm">
               <img src={`http://localhost:8000${product.gambar}`} alt={product.kategori} className="w-full h-48 object-cover" />
