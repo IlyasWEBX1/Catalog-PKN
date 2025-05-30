@@ -44,7 +44,7 @@ function Katalog() {
             <div className="text-center mb-12">
                 <h2 className="text-5xl font-bold">Katalog</h2>
             </div>
-            <div className="flex-1 gap-2 flex justify-center px-4 py-4">
+            <div className="flex-1 gap-2 flex flex-wrap justify-center px-4 py-4">
             <input
                 type="text"
                 placeholder="Search..."
