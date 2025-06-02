@@ -11,7 +11,7 @@ function LoginPage() {
   const handleSubmit = e => {
     e.preventDefault();
 
-    axios.post('http://localhost:8000/Catalogue_api/token/', { username, password })
+    axios.post('https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/token/', { username, password })
       .then(res => {
         const token = res.data.access;
         localStorage.setItem('authToken', token);

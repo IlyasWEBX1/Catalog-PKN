@@ -26,10 +26,10 @@ function AdminPage() {
   const [newImage, setNewImage] = useState(null);
   const [editedImage, setEditedImage] = useState(null);
   const refreshProducts = () => {
-  Promise.all([axios.get('http://127.0.0.1:8000/Catalogue_api/produk/'), 
-    axios.get('http://127.0.0.1:8000/Catalogue_api/kategori/'),
-  axios.get('http://127.0.0.1:8000/Catalogue_api/pesan/'),
-    axios.get('http://127.0.0.1:8000/Catalogue_api/user/'),
+  Promise.all([axios.get('https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/produk/'), 
+    axios.get('https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/kategori/'),
+  axios.get('https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/pesan/'),
+    axios.get('https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/user/'),
 ])
     .then(([res, res2, res3, res4]) => {
       setProducts(res.data) 
