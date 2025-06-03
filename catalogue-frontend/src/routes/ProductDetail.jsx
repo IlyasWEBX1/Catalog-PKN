@@ -10,7 +10,7 @@ function ProductDetail({}) {
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
-    axios.get(`http://localhost:8000/Catalogue_api/produk/${id}/`)
+    axios.get(`https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/produk/${id}/`)
       .then((response) =>{
         setProduct(response.data)
         setMessage(`Hello, I have a question about ${response.data.nama}.`)
@@ -20,7 +20,7 @@ function ProductDetail({}) {
   const handleChat = async () => {
 
   try {
-    await axios.post('http://localhost:8000/Catalogue_api/send-message/', {
+    await axios.post('https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/send-message/', {
       product_id: product.id,
       message: message,
       user_id: null 

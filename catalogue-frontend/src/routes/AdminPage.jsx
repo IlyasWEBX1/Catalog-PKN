@@ -43,7 +43,7 @@ function AdminPage() {
       refreshProducts();
   },[])
   const handleDelete = (id) => {
-  axios.delete(`http://127.0.0.1:8000/Catalogue_api/produk/${id}/`, {
+  axios.delete(`https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/produk/${id}/`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -52,7 +52,7 @@ function AdminPage() {
   .catch((err) => console.error('Delete error:', err));
 };
  const handleDeleteCategory = (id) => {
-  axios.delete(`http://127.0.0.1:8000/Catalogue_api/kategori/${id}/`, {
+  axios.delete(`https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/kategori/${id}/`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -61,7 +61,7 @@ function AdminPage() {
   .catch((err) => console.error('Delete error:', err));
 };
 const handleDeletePesan = (id) => {
-  axios.delete(`http://127.0.0.1:8000/Catalogue_api/pesan/${id}/`, {
+  axios.delete(`https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/pesan/${id}/`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
@@ -98,7 +98,7 @@ const handleDeletePesan = (id) => {
   formData.append('gambar', editedImage);
 }
 
-  axios.patch(`http://127.0.0.1:8000/Catalogue_api/produk/${editingId}/`, formData, {
+  axios.patch(`https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/produk/${editingId}/`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
       Authorization: `Bearer ${token}`,
@@ -117,7 +117,7 @@ const handleDeletePesan = (id) => {
   e.preventDefault();
 
   axios.put(
-    `http://127.0.0.1:8000/Catalogue_api/kategori/${editingCategoryId}/`,
+    `https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/kategori/${editingCategoryId}/`,
     {
       nama: editedCategoryName,
     },
@@ -146,7 +146,7 @@ const handleAddProduct = (e) => {
     formData.append('gambar', newImage); // 'gambar' harus sesuai dengan nama field di model Django
   }
 
-  axios.post('http://127.0.0.1:8000/Catalogue_api/produk/', formData, {
+  axios.post('https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/produk/', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
       Authorization: `Bearer ${token}`,
@@ -168,7 +168,7 @@ const handleAddProduct = (e) => {
 const handleAddCategory = (e) => {
   e.preventDefault();
   axios.post(
-    'http://127.0.0.1:8000/Catalogue_api/kategori/',
+    'https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/kategori/',
     {
       nama: newCategoryName,
     },
@@ -189,7 +189,7 @@ const handleAddCategory = (e) => {
   });
 };
 const handleConfirm = (produkId, pesanId) => {
-  axios.post(`http://127.0.0.1:8000/Catalogue_api/kurangi-stok/${produkId}/${pesanId}`)
+  axios.post(`https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/kurangi-stok/${produkId}/${pesanId}`)
     .then(() => {
       // Fetch both updated products and messages
       refreshProducts()

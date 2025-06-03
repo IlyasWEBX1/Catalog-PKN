@@ -16,8 +16,8 @@ function Katalog() {
 
     useEffect(() => {
         Promise.all([
-            axios.get("http://localhost:8000/Catalogue_api/produk/"),
-            axios.get("http://localhost:8000/Catalogue_api/kategori/"),
+            axios.get("https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/produk/"),
+            axios.get("https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/kategori/"),
         ])
             .then(([produkResponse, kategoriResponse]) => {
             setProducts(produkResponse.data);
@@ -91,7 +91,7 @@ function Katalog() {
                 <div className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer transition delay-50 duration-300 ease-in-out hover:-translate-y-1 hover:scale-110">
                     <div className="h-48 overflow-hidden">
                     <img
-                        src={`http://localhost:8000${product.gambar}`}
+                        src={`https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/${product.gambar}`}
                         alt={product.title}
                         className="w-full h-full object-cover"
                     />

@@ -32,7 +32,7 @@ function LoginPage() {
         }});
   };
   const handleGuestLogin = () => {
-    axios.post('http://localhost:8000/Catalogue_api/token/', {
+    axios.post('https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/token/', {
       username: 'guest',
       password: 'guest123',
     })
