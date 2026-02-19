@@ -1,544 +1,685 @@
-// src/pages/AdminPage.jsx
-import React from 'react';
-import { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import AdminDashboard from "../components/AdminMenu";
+import { useNavigate } from "react-router-dom";
 
 function AdminPage() {
-  const token = localStorage.getItem('authToken');
-  const [products, setProducts] = useState([])
-  const [messages, setMessages] = useState([])
-  const [users, setUsers] = useState([])
+  const token = localStorage.getItem("authToken");
+  const [activeTab, setActiveTab] = useState("products"); // Tab state
+
+  // --- ORIGINAL STATE HOOKS (All Preserved) ---
+  const [products, setProducts] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [categories, setCategories] = useState([]);
+
   const [editingId, setEditingId] = useState(null);
   const [editingCategoryId, setEditingCategoryId] = useState(null);
   const [editedCategoryName, setEditedCategoryName] = useState("");
-  const [editedName, setEditedName] = useState('');
-  const [editedPrice, setEditedPrice] = useState('');
-  const [newCategoryName, setNewCategoryName] = useState('');
+  const [editedName, setEditedName] = useState("");
+  const [editedPrice, setEditedPrice] = useState("");
   const [editedStock, setEditedStock] = useState(null);
-  const [editedDesc, setEditedDesc] = useState('');
+  const [editedDesc, setEditedDesc] = useState("");
   const [EditedCategory, setEditedCategory] = useState(null);
-  const [categories, setCategories] = useState([])
-  const [newName, setNewName] = useState('');
-  const [newPrice, setNewPrice] = useState('');
-  const [newStock, setNewStock] = useState('');
-  const [newCategory, setNewCategory] = useState('');
-  const [newDesc, setNewDesc] = useState('');
-  const [newImage, setNewImage] = useState(null);
   const [editedImage, setEditedImage] = useState(null);
+
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newName, setNewName] = useState("");
+  const [newPrice, setNewPrice] = useState("");
+  const [newStock, setNewStock] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [newDesc, setNewDesc] = useState("");
+  const [newImage, setNewImage] = useState(null);
+
+  // --- ORIGINAL LOGIC (All Preserved) ---
   const refreshProducts = () => {
-  Promise.all([axios.get('https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/produk/'), 
-    axios.get('https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/kategori/'),
-  axios.get('https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/pesan/'),
-    axios.get('https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/user/'),
-])
-    .then(([res, res2, res3, res4]) => {
-      setProducts(res.data) 
-      setCategories(res2.data)
-      setMessages(res3.data)
-      setUsers(res4.data)
-    })
-    .catch((err) => console.log("Error:", err));
-};
-  useEffect(()=> {
-      refreshProducts();
-  },[])
+    Promise.all([
+      axios.get("http://localhost:8000/Catalogue_api/produk/"),
+      axios.get("http://localhost:8000/Catalogue_api/kategori/"),
+      axios.get("http://localhost:8000/Catalogue_api/pesan/"),
+      axios.get("http://localhost:8000/Catalogue_api/user/"),
+    ])
+      .then(([res, res2, res3, res4]) => {
+        setProducts(res.data);
+        setCategories(res2.data);
+        setMessages(res3.data);
+        setUsers(res4.data);
+      })
+      .catch((err) => console.log("Error:", err));
+  };
+
+  useEffect(() => {
+    refreshProducts();
+  }, []);
+
   const handleDelete = (id) => {
-  axios.delete(`https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/produk/${id}/`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-  .then(() => refreshProducts())
-  .catch((err) => console.error('Delete error:', err));
-};
- const handleDeleteCategory = (id) => {
-  axios.delete(`https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/kategori/${id}/`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-  .then(() => refreshProducts())
-  .catch((err) => console.error('Delete error:', err));
-};
-const handleDeletePesan = (id) => {
-  axios.delete(`https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/pesan/${id}/`, {
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
-  })
-  .then(() => refreshProducts())
-  .catch((err) => console.error('Delete error:', err));
-};
-  const productTypes = [0, ...new Set(categories.map((category) => category.nama))];
+    axios
+      .delete(`http://localhost:8000/Catalogue_api/produk/${id}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => refreshProducts())
+      .catch((err) => console.error("Delete error:", err));
+  };
+
+  const handleDeleteCategory = (id) => {
+    axios
+      .delete(`http://localhost:8000/Catalogue_api/kategori/${id}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => refreshProducts())
+      .catch((err) => console.error("Delete error:", err));
+  };
+
+  const handleDeletePesan = (id) => {
+    axios
+      .delete(`http://localhost:8000/Catalogue_api/pesan/${id}/`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then(() => refreshProducts())
+      .catch((err) => console.error("Delete error:", err));
+  };
+
   const handleEdit = (product) => {
     setEditingId(product.id);
     setEditedName(product.nama);
     setEditedPrice(product.harga);
     setEditedStock(product.stok);
-    setEditedCategory(product.kategori)
-    setEditedDesc(product.deskripsi)
-    setEditedImage(product.gambar)
+    setEditedCategory(product.kategori);
+    setEditedDesc(product.deskripsi);
+    setEditedImage(product.gambar);
   };
+
   const handleEditCategory = (category) => {
     setEditingCategoryId(category.id);
     setEditedCategoryName(category.nama);
   };
- const handleUpdate = (e) => {
-  e.preventDefault();
 
-  const formData = new FormData();
-  formData.append('nama', editedName);
-  formData.append('harga', editedPrice);
-  formData.append('kategori', EditedCategory);
-  formData.append('deskripsi', editedDesc);
-  formData.append('stok', editedStock);
-
-  // Tambahkan gambar hanya jika ada yang baru dipilih
- if (editedImage && editedImage instanceof File && editedImage.size > 0) {
-  formData.append('gambar', editedImage);
-}
-
-  axios.patch(`https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/produk/${editingId}/`, formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-      Authorization: `Bearer ${token}`,
-    },
-  })
-  .then(() => {
-    setEditingId(null);
-    setEditedImage(null);  // reset gambar setelah update
-    refreshProducts();
-  })
-  .catch(err => {
-    console.error('Update failed:', err.response?.data || err);
-  });
-};
- const handleCategoryUpdate = (e) => {
-  e.preventDefault();
-
-  axios.put(
-    `https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/kategori/${editingCategoryId}/`,
-    {
-      nama: editedCategoryName,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+  const handleUpdate = (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("nama", editedName);
+    formData.append("harga", editedPrice);
+    formData.append("kategori", EditedCategory);
+    formData.append("deskripsi", editedDesc);
+    formData.append("stok", editedStock);
+    if (editedImage && editedImage instanceof File && editedImage.size > 0) {
+      formData.append("gambar", editedImage);
     }
-  ).then(() => {
-    setEditingCategoryId(null);
-    refreshProducts();
-  }).catch(err => {
-    console.error('Update failed:', err.response?.data || err);
-  });
-};
+    axios
+      .patch(
+        `http://localhost:8000/Catalogue_api/produk/${editingId}/`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(() => {
+        setEditingId(null);
+        setEditedImage(null);
+        refreshProducts();
+      })
+      .catch((err) =>
+        console.error("Update failed:", err.response?.data || err),
+      );
+  };
 
-const handleAddProduct = (e) => {
-  e.preventDefault();
-  const formData = new FormData();
-  formData.append('nama', newName);
-  formData.append('harga', newPrice);
-  formData.append('stok', newStock);
-  formData.append('kategori', newCategory);
-  formData.append('deskripsi', newDesc);
-  if (newImage) {
-    formData.append('gambar', newImage); // 'gambar' harus sesuai dengan nama field di model Django
-  }
+  const handleCategoryUpdate = (e) => {
+    e.preventDefault();
+    axios
+      .put(
+        `http://localhost:8000/Catalogue_api/kategori/${editingCategoryId}/`,
+        { nama: editedCategoryName },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      )
+      .then(() => {
+        setEditingCategoryId(null);
+        refreshProducts();
+      })
+      .catch((err) =>
+        console.error("Update failed:", err.response?.data || err),
+      );
+  };
 
-  axios.post('https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/produk/', formData, {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-      Authorization: `Bearer ${token}`,
-    },
-  })
-  .then(() => {
-    setNewName('');
-    setNewPrice('');
-    setNewStock('');
-    setNewCategory('');
-    setNewDesc('');
-    setNewImage(null);
-    refreshProducts();
-  })
-  .catch(err => {
-    console.error('Add product failed:', err.response?.data || err);
-  });
-};
-const handleAddCategory = (e) => {
-  e.preventDefault();
-  axios.post(
-    'https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/kategori/',
-    {
-      nama: newCategoryName,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }
-  ).then(() => {
-    setNewName('');
-    setNewPrice('');
-    setNewStock('');
-    setNewCategory('');
-    setNewDesc('');
-    refreshProducts();
-  }).catch(err => {
-    console.error('Add product failed:', err.response?.data || err);
-  });
-};
-const handleConfirm = (produkId, pesanId) => {
-  axios.post(`https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api/kurangi-stok/${produkId}/${pesanId}`)
-    .then(() => {
-      // Fetch both updated products and messages
-      refreshProducts()
-    })
-    .catch(err => {
-      console.error('Error:', err);
-      alert('Gagal mengurangi stok');
-    });
-};
+  const handleAddProduct = (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    formData.append("nama", newName);
+    formData.append("harga", newPrice);
+    formData.append("stok", newStock);
+    formData.append("kategori", newCategory);
+    formData.append("deskripsi", newDesc);
+    if (newImage) formData.append("gambar", newImage);
+    axios
+      .post("http://localhost:8000/Catalogue_api/produk/", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(() => {
+        setNewName("");
+        setNewPrice("");
+        setNewStock("");
+        setNewCategory("");
+        setNewDesc("");
+        setNewImage(null);
+        refreshProducts();
+        setActiveTab("products");
+      })
+      .catch((err) =>
+        console.error("Add product failed:", err.response?.data || err),
+      );
+  };
+
+  const handleAddCategory = (e) => {
+    e.preventDefault();
+    axios
+      .post(
+        "http://localhost:8000/Catalogue_api/kategori/",
+        { nama: newCategoryName },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      )
+      .then(() => {
+        setNewCategoryName("");
+        refreshProducts();
+        setActiveTab("categories");
+      })
+      .catch((err) =>
+        console.error("Add category failed:", err.response?.data || err),
+      );
+  };
+
+  const handleConfirm = (produkId, pesanId) => {
+    axios
+      .post(
+        `http://localhost:8000/Catalogue_api/konfirmasi-pesanan/${produkId}/${pesanId}`,
+      )
+      .then(() => refreshProducts())
+      .catch((err) => {
+        alert("Gagal mengurangi stok");
+      });
+  };
+
+  const navigate = useNavigate();
+
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-bold text-orange-800 mb-6">Admin Dashboard</h1>
+    <div className="min-h-screen bg-slate-50 flex">
+      <AdminDashboard />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white p-6 rounded shadow overflow-x-auto">
-          <h2 className="text-xl font-semibold mb-2">Manage Products</h2>
-          <p className="text-gray-700">Add, update, or delete products from the catalog.</p>
-          <table className="mt-6 min-w-full table-auto border">
-            <thead>
-              <tr className="bg-orange-100 text-left">
-                <th className="px-4 py-2">ID</th>
-                <th className="px-4 py-2">Nama</th>
-                <th className="px-4 py-2">Harga</th>
-                <th className="px-4 py-2">Stok</th>
-                <th className="px-4 py-2">Kategori</th>
-                <th className="px-4 py-2">Deskripsi</th>
-                <th className="px-4 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {products.map((product) => (
-                <tr key={product.id} className="border-t">
-                  <td className="px-4 py-2">{product.id}</td>
-                  <td className="px-4 py-2">{product.nama}</td>
-                  <td className="px-4 py-2">Rp. {parseInt(product.harga).toLocaleString("id-ID")}</td>
-                  <td className="px-4 py-2">{product.stok}</td>
-                  <td className="px-4 py-2">
-                    {categories.find(cat => cat.id === product.kategori)?.nama || 'Unknown'}
-                  </td>
-                  <td className="px-4 py-2">{product.deskripsi}</td>
-                  <td className="flex flex-row px-4 py-2 space-x-2">
-                    <button
-                      onClick={() => handleEdit(product)}
-                      className="px-2 py-1 bg-blue-500 text-white rounded"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDelete(product.id)}
-                      className="px-2 py-1 bg-red-500 text-white rounded"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <div className="bg-white p-6 rounded shadow">
-          <h2 className="text-xl font-semibold mb-2">Manage Categories</h2>
-          <p className="text-gray-700">Add, update, or delete categories.</p>
-          <table className="mt-6 min-w-full table-auto border">
-            <thead>
-              <tr className="bg-orange-100 text-left">
-                <th className="px-4 py-2">ID</th>
-                <th className="px-4 py-2">Nama</th>
-                <th className="px-4 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {categories.map((product) => (
-                <tr key={product.id} className="border-t">
-                  <td className="px-4 py-2">{product.id}</td>
-                  <td className="px-4 py-2">{product.nama}</td>
-                  <td className="flex flex-row px-4 py-2 space-x-2">
-                    <button
-                      onClick={() => handleEditCategory(product)}
-                      className="px-2 py-1 bg-blue-500 text-white rounded"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleDeleteCategory(product.id)}
-                      className="px-2 py-1 bg-red-500 text-white rounded"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-          <div
-            className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ${
-    editingId ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-  }`}
-            onClick={() => setEditingId(null)} // Close modal if click outside form
-          >
-            <form
-              onSubmit={handleUpdate}
-              className="bg-white p-6 rounded shadow w-96 transform transition-transform duration-300 ease-in-out
-    ${editingId ? 'scale-100' : 'scale-90'}"
-              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside form
-            >
-              {/* Your form fields here */}
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="name" className="block mb-1 font-semibold">Nama :</label>
-                  <input
-                    id="name"
-                    type="text"
-                    value={editedName}
-                    onChange={(e) => setEditedName(e.target.value)}
-                    className="border px-2 py-1 rounded w-full"
-                  />
-                </div>
+      {/* Main Content Area */}
+      <main className="flex-1 ml-[260px] p-8 pt-36">
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <header className="mb-10">
+            <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">
+              Admin Dashboard
+            </h1>
+            <p className="text-slate-500 mt-2">
+              Manage your inventory, categories, and customer messages.
+            </p>
+          </header>
 
-                <div>
-                  <label htmlFor="price" className="block mb-1 font-semibold">Harga :</label>
-                  <input
-                    id="price"
-                    type="number"
-                    value={editedPrice}
-                    onChange={(e) => setEditedPrice(e.target.value)}
-                    className="border px-2 py-1 rounded w-full"
-                  />
-                </div>
+          {/* Tab Navigation */}
+          <div className="flex space-x-2 bg-slate-200/50 p-1.5 rounded-2xl w-fit mb-8 shadow-inner">
+            {["products", "categories", "messages", "forms"].map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`px-6 py-2.5 text-sm font-bold rounded-xl transition-all duration-200 ${
+                  activeTab === tab
+                    ? "bg-white text-orange-700 shadow-md transform scale-105"
+                    : "text-slate-600 hover:text-orange-600 hover:bg-white/50"
+                }`}
+              >
+                {tab.toUpperCase()}
+              </button>
+            ))}
+          </div>
 
-                <div>
-                  <label htmlFor="stock" className="block mb-1 font-semibold">Stok :</label>
-                  <input
-                    id="stock"
-                    type="number"
-                    value={editedStock}
-                    onChange={(e) => setEditedStock(e.target.value)}
-                    className="border px-2 py-1 rounded w-full"
-                  />
+          {/* Tab Content Cards */}
+          <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/50 border border-slate-100 overflow-hidden min-h-[500px]">
+            {/* 1. PRODUCTS TABLE TAB */}
+            {activeTab === "products" && (
+              <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                <div className="p-6 border-b border-slate-50 flex justify-between items-center">
+                  <h2 className="text-xl font-bold text-slate-800">
+                    Product List
+                  </h2>
                 </div>
+                <div className="overflow-x-auto px-4 pb-4">
+                  <table className="w-full text-left">
+                    <thead>
+                      <tr className="text-slate-400 text-xs font-black uppercase tracking-widest border-b border-slate-100">
+                        <th className="px-4 py-5">ID</th>
+                        <th className="px-4 py-5">Product</th>
+                        <th className="px-4 py-5">Price</th>
+                        <th className="px-4 py-5">Stock</th>
+                        <th className="px-4 py-5">Category</th>
+                        <th className="px-4 py-5 text-right">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-50">
+                      {products.map((product) => (
+                        <tr
+                          key={product.id}
+                          className="hover:bg-slate-50/50 transition-colors group"
+                        >
+                          <td className="px-4 py-4 text-slate-400 font-mono text-sm">
+                            #{product.id}
+                          </td>
+                          <td className="px-4 py-4 font-bold text-slate-700">
+                            {product.nama}
+                          </td>
+                          <td className="px-4 py-4 font-medium text-slate-600">
+                            Rp {parseInt(product.harga).toLocaleString("id-ID")}
+                          </td>
+                          <td className="px-4 py-4">
+                            <span
+                              className={`px-3 py-1 rounded-full text-xs font-bold ${product.stok < 5 ? "bg-red-100 text-red-600" : "bg-emerald-100 text-emerald-600"}`}
+                            >
+                              {product.stok} unit
+                            </span>
+                          </td>
+                          <td className="px-4 py-4 text-slate-500 text-sm">
+                            {categories.find(
+                              (cat) => cat.id === product.kategori,
+                            )?.nama || "Unknown"}
+                          </td>
+                          <td className="px-4 py-4 text-right space-x-2">
+                            <button
+                              onClick={() => handleEdit(product)}
+                              className="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-lg font-bold text-xs hover:bg-blue-600 hover:text-white transition-all"
+                            >
+                              Edit
+                            </button>
+                            <button
+                              onClick={() => handleDelete(product.id)}
+                              className="px-4 py-1.5 bg-red-50 text-red-600 rounded-lg font-bold text-xs hover:bg-red-600 hover:text-white transition-all"
+                            >
+                              Delete
+                            </button>
+                            <button
+                              onClick={() =>
+                                navigate(`/ProductConfiguration/${product.id}`)
+                              }
+                              className="px-4 py-1.5 bg-blue-50 text-blue-600 rounded-lg font-bold text-xs hover:bg-blue-600 hover:text-white transition-all border border-blue-100"
+                            >
+                              Configure
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
 
-                <div>
-                  <label htmlFor="description" className="block mb-1 font-semibold">Deskripsi :</label>
-                  <input
-                    id="description"
-                    type="text"
-                    value={editedDesc}
-                    onChange={(e) => setEditedDesc(e.target.value)}
-                    className="border px-2 py-1 rounded w-full"
-                  />
+            {/* 2. CATEGORIES TAB */}
+            {activeTab === "categories" && (
+              <div className="p-8 animate-in fade-in duration-500">
+                <h2 className="text-2xl font-bold text-slate-800 mb-6">
+                  Manage Categories
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {categories.map((cat) => (
+                    <div
+                      key={cat.id}
+                      className="p-5 border border-slate-100 rounded-2xl flex justify-between items-center hover:border-orange-200 transition-all shadow-sm"
+                    >
+                      <div>
+                        <span className="text-xs font-mono text-slate-400">
+                          ID: {cat.id}
+                        </span>
+                        <p className="font-bold text-slate-800">{cat.nama}</p>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={() => handleEditCategory(cat)}
+                          className="p-2 text-blue-500 hover:bg-blue-50 rounded-lg transition-colors"
+                        >
+                          <i className="fas fa-edit"></i>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteCategory(cat.id)}
+                          className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                        >
+                          <i className="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div>
-                  <label htmlFor="image" className="block mb-1 font-semibold">Gambar Baru (Opsional):</label>
-                  <input
-                    id="image"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setEditedImage(e.target.files[0])}
-                    className="border px-2 py-1 rounded w-full"
-                  />
+              </div>
+            )}
+
+            {/* 3. MESSAGES TAB */}
+            {activeTab === "messages" && (
+              <div className="p-6 animate-in fade-in duration-500">
+                <h2 className="text-2xl font-bold text-slate-800 mb-6">
+                  Customer Messages
+                </h2>
+                <div className="overflow-x-auto border border-slate-100 rounded-2xl">
+                  <table className="w-full text-left border-collapse">
+                    <thead className="bg-slate-800 text-white">
+                      <tr>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">
+                          No
+                        </th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">
+                          Customer
+                        </th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">
+                          Product
+                        </th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider">
+                          Message
+                        </th>
+                        <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-right">
+                          Actions
+                        </th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {messages.map((pesan, index) => (
+                        <tr
+                          key={index}
+                          className="hover:bg-slate-50 transition-colors"
+                        >
+                          <td className="px-6 py-4 text-sm font-mono">
+                            {pesan.id}
+                          </td>
+                          <td className="px-6 py-4 font-bold">
+                            {users.find((u) => u.id === pesan.user)?.nama ||
+                              "Unknown"}
+                          </td>
+                          <td className="px-6 py-4 text-sm">
+                            {products.find((p) => p.id === pesan.produk)
+                              ?.nama || "Unknown"}
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-sm font-bold text-slate-700">
+                              {pesan.laporan}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              {pesan.isi_pesan}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4 text-right flex justify-end gap-2 mt-4">
+                            <button
+                              onClick={() =>
+                                handleConfirm(pesan.produk, pesan.id)
+                              }
+                              className="bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg shadow-emerald-200"
+                            >
+                              Confirm
+                            </button>
+                            <button
+                              onClick={() => handleDeletePesan(pesan.id)}
+                              className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg shadow-red-200"
+                            >
+                              Delete
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
-                <div>
-                  <label htmlFor="category-select" className="block mb-1 font-semibold">Kategori :</label>
-                  <select
-                    id="category-select"
-                    value={EditedCategory}
-                    onChange={(e) => setEditedCategory(Number(e.target.value))}
-                    className="border px-2 py-1 rounded w-full"
+              </div>
+            )}
+
+            {/* 4. ADD NEW FORMS TAB (Consolidated all original "Add" forms) */}
+            {activeTab === "forms" && (
+              <div className="p-8 grid grid-cols-1 lg:grid-cols-2 gap-10 animate-in zoom-in-95 duration-300">
+                {/* Add Category Form */}
+                <div className="space-y-6">
+                  <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                    <span className="w-2 h-6 bg-orange-600 rounded-full"></span>{" "}
+                    Add Category
+                  </h3>
+                  <form
+                    onSubmit={handleAddCategory}
+                    className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4 shadow-inner"
                   >
-                    <option value="">--Please choose a category--</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.nama}
-                      </option>
-                    ))}
-                  </select>
+                    <input
+                      type="text"
+                      placeholder="Category Name"
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 focus:ring-4 focus:ring-orange-100 focus:border-orange-500 transition-all outline-none font-medium"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-orange-700 transition-all transform hover:-translate-y-1"
+                    >
+                      Create Category
+                    </button>
+                  </form>
                 </div>
-              </div>
-                            {EditedCategory && (
-                <p>You selected: <strong>{EditedCategory}</strong></p>
-              )}
 
-              <button
-                type="submit"
-                className="bg-blue-600 text-white px-4 py-2 rounded mt-4"
-              >
-                Update
-              </button>
-            </form>
-          </div>
-           <div
-            className={`fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 transition-opacity duration-300 ${
-    editingCategoryId ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
-  }`}
-            onClick={() => setEditingCategoryId(null)} // Close modal if click outside form
-          >
-            <form
-              onSubmit={handleCategoryUpdate}
-              className="bg-white p-6 rounded shadow w-96 transform transition-transform duration-300 ease-in-out
-    ${editingCategoryId ? 'scale-100' : 'scale-90'}"
-              onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside form
-            >
-              {/* Your form fields here */}
-              <div className="space-y-4">
-                <div>
-                  <label htmlFor="name" className="block mb-1 font-semibold">Nama :</label>
-                  <input
-                    id="name"
-                    type="text"
-                    value={editedCategoryName}
-                    onChange={(e) => setEditedCategoryName(e.target.value)}
-                    className="border px-2 py-1 rounded w-full"
-                  />
+                {/* Add Product Form */}
+                <div className="space-y-6">
+                  <h3 className="text-xl font-black text-slate-800 uppercase tracking-tight flex items-center gap-2">
+                    <span className="w-2 h-6 bg-emerald-600 rounded-full"></span>{" "}
+                    Add Product
+                  </h3>
+                  <form
+                    onSubmit={handleAddProduct}
+                    className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4 shadow-inner"
+                  >
+                    <input
+                      type="text"
+                      placeholder="Product Name"
+                      value={newName}
+                      onChange={(e) => setNewName(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200"
+                      required
+                    />
+                    <div className="grid grid-cols-2 gap-4">
+                      <input
+                        type="number"
+                        placeholder="Price"
+                        value={newPrice}
+                        onChange={(e) => setNewPrice(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200"
+                        required
+                      />
+                      <input
+                        type="number"
+                        placeholder="Stock"
+                        value={newStock}
+                        onChange={(e) => setNewStock(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-slate-200"
+                        required
+                      />
+                    </div>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => setNewImage(e.target.files[0])}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white"
+                    />
+                    <select
+                      value={newCategory}
+                      onChange={(e) => setNewCategory(Number(e.target.value))}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200"
+                      required
+                    >
+                      <option value="">-- Select Category --</option>
+                      {categories.map((category) => (
+                        <option key={category.id} value={category.id}>
+                          {category.nama}
+                        </option>
+                      ))}
+                    </select>
+                    <textarea
+                      placeholder="Product Description"
+                      value={newDesc}
+                      onChange={(e) => setNewDesc(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 h-24"
+                      required
+                    />
+                    <button
+                      type="submit"
+                      className="w-full bg-orange-600 text-white py-4 rounded-xl font-black text-lg hover:bg-orange-700 transition-all shadow-lg shadow-orange-200"
+                    >
+                      Publish Product
+                    </button>
+                  </form>
                 </div>
               </div>
-              <button
-                type="submit"
-                className="bg-blue-600 text-white px-4 py-2 rounded mt-4"
-              >
-                Update
-              </button>
-            </form>
+            )}
           </div>
-        <div className="bg-white p-6 rounded shadow">
-          <h2 className="text-xl font-semibold mb-2">Manage Messages</h2>
-          <p className="text-gray-700">View Messages and confirm order.</p>
-          {/* Add user-related actions here */}
-          <div className="overflow-x-auto">
-          <table className="min-w-full table-auto border-collapse border border-gray-300">
-            <thead className="bg-orange-800 text-white">
-              <tr>
-                <th className="border px-4 py-2">No</th>
-                <th className="border px-4 py-2">User</th>
-                <th className="border px-4 py-2">Produk</th>
-                <th className="border px-4 py-2">Laporan</th>
-                <th className="border px-4 py-2">Isi Pesan</th>
-                <th className="border px-4 py-2">Waktu</th>
-                 <th className="border px-4 py-2">Confirmation</th>
-              </tr>
-            </thead>
-            <tbody>
-              {messages.map((pesan, index) => (
-                <tr key={index} className="hover:bg-gray-100">
-                  <td className="border px-4 py-2 text-center">{pesan.id}</td>
-                  <td className="border px-4 py-2">{users.find((user)=>user.id === pesan.user)?.nama || "Uknown"}</td>
-                  <td className="border px-4 py-2">{products.find((product) => product.id === pesan.produk)?.nama || "Unknown"}</td>
-                  <td className="border px-4 py-2">{pesan.laporan}</td>
-                  <td className="border px-4 py-2">{pesan.isi_pesan}</td>
-                  <td className="border px-4 py-2">{new Date(pesan.waktu).toLocaleString("id-ID")}</td>
-                  <td className="border px-4 py-2 flex flex-row gap-2">
-                    <button
-                      onClick={() => handleConfirm(pesan.produk, pesan.id)}
-                      className="px-2 py-1 bg-green-500 text-white rounded"
-                    >
-                      Confirm
-                    </button>
-                    <button
-                      onClick={() => handleDeletePesan(pesan.id)}
-                      className="px-2 py-1 bg-red-500 text-white rounded"
-                    >
-                      Delete
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
-        </div>
-        <div className="bg-white p-6 rounded shadow mt-6">
-          <h2 className="text-xl font-semibold mb-2">Add New Category</h2>
-          <form onSubmit={handleAddCategory} className="space-y-2">
-            <input
-              type="text"
-              placeholder="Nama Produk"
-              value={newCategoryName}
-              onChange={(e) => setNewCategoryName(e.target.value)}
-              className="border px-2 py-1 rounded w-full"
-              required
-            />
+      </main>
+
+      {/* --- ORIGINAL MODALS (All Preserved and Styled) --- */}
+
+      {/* 1. Edit Product Modal */}
+      <div
+        className={`fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 ${editingId ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        onClick={() => setEditingId(null)}
+      >
+        <form
+          onSubmit={handleUpdate}
+          className={`bg-white p-8 rounded-[2rem] shadow-2xl w-[450px] transform transition-all duration-300 ${editingId ? "scale-100 rotate-0" : "scale-90 rotate-2"}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h2 className="text-2xl font-black text-slate-800 mb-6 border-b pb-4">
+            Update Product
+          </h2>
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto px-1">
+            <div>
+              <label className="block text-xs font-black text-slate-400 uppercase mb-1">
+                Nama :
+              </label>
+              <input
+                type="text"
+                value={editedName}
+                onChange={(e) => setEditedName(e.target.value)}
+                className="w-full px-4 py-2 border border-slate-200 rounded-xl"
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-xs font-black text-slate-400 uppercase mb-1">
+                  Harga :
+                </label>
+                <input
+                  type="number"
+                  value={editedPrice}
+                  onChange={(e) => setEditedPrice(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-black text-slate-400 uppercase mb-1">
+                  Stok :
+                </label>
+                <input
+                  type="number"
+                  value={editedStock}
+                  onChange={(e) => setEditedStock(e.target.value)}
+                  className="w-full px-4 py-2 border border-slate-200 rounded-xl"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-xs font-black text-slate-400 uppercase mb-1">
+                Deskripsi :
+              </label>
+              <textarea
+                value={editedDesc}
+                onChange={(e) => setEditedDesc(e.target.value)}
+                className="w-full px-4 py-2 border border-slate-200 rounded-xl"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-slate-400 uppercase mb-1">
+                New Image :
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setEditedImage(e.target.files[0])}
+                className="w-full px-4 py-2 border border-slate-200 rounded-xl"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-black text-slate-400 uppercase mb-1">
+                Kategori :
+              </label>
+              <select
+                value={EditedCategory}
+                onChange={(e) => setEditedCategory(Number(e.target.value))}
+                className="w-full px-4 py-2 border border-slate-200 rounded-xl"
+              >
+                {categories.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nama}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="flex gap-3 mt-8">
+            <button
+              type="button"
+              onClick={() => setEditingId(null)}
+              className="flex-1 py-3 text-slate-500 font-bold hover:bg-slate-50 rounded-xl"
+            >
+              Cancel
+            </button>
             <button
               type="submit"
-              className="bg-green-600 text-white px-4 py-2 rounded"
+              className="flex-1 py-3 bg-orange-600 text-white font-bold rounded-xl shadow-lg shadow-orange-200"
             >
-              Add Category
+              Save Changes
             </button>
-          </form>
-        </div>
-        <div className="bg-white p-6 rounded shadow mt-6">
-          <h2 className="text-xl font-semibold mb-2">Add New Product</h2>
-          <form onSubmit={handleAddProduct} className="space-y-2">
+          </div>
+        </form>
+      </div>
+
+      {/* 2. Edit Category Modal */}
+      <div
+        className={`fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-sm transition-opacity duration-300 ${editingCategoryId ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"}`}
+        onClick={() => setEditingCategoryId(null)}
+      >
+        <form
+          onSubmit={handleCategoryUpdate}
+          className={`bg-white p-8 rounded-[2rem] shadow-2xl w-96 transform transition-all duration-300 ${editingCategoryId ? "scale-100" : "scale-90"}`}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <h2 className="text-2xl font-black text-slate-800 mb-6">
+            Edit Category
+          </h2>
+          <div className="space-y-4">
+            <label className="block text-xs font-black text-slate-400 uppercase mb-1">
+              Category Name :
+            </label>
             <input
               type="text"
-              placeholder="Nama Produk"
-              value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              className="border px-2 py-1 rounded w-full"
-              required
+              value={editedCategoryName}
+              onChange={(e) => setEditedCategoryName(e.target.value)}
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl outline-none focus:border-orange-500"
             />
-            <input
-              type="number"
-              placeholder="Harga"
-              value={newPrice}
-              onChange={(e) => setNewPrice(e.target.value)}
-              className="border px-2 py-1 rounded w-full"
-              required
-            />
-            <input
-              type="number"
-              placeholder="Stok"
-              value={newStock}
-              onChange={(e) => setNewStock(e.target.value)}
-              className="border px-2 py-1 rounded w-full"
-              required
-            />
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => setNewImage(e.target.files[0])}
-              className="border px-2 py-1 rounded w-full"
-            />
-            <select
-              value={newCategory}
-              onChange={(e) => setNewCategory(Number(e.target.value))}
-              className="border px-2 py-1 rounded w-full"
-              required
-            >
-              <option value="">--Pilih Kategori--</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {category.nama}
-                </option>
-              ))}
-            </select>
-            <textarea
-              placeholder="Deskripsi"
-              value={newDesc}
-              onChange={(e) => setNewDesc(e.target.value)}
-              className="border px-2 py-1 rounded w-full"
-              required
-            />
-            <button
-              type="submit"
-              className="bg-green-600 text-white px-4 py-2 rounded"
-            >
-              Add Product
-            </button>
-          </form>
-        </div>
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-slate-900 text-white py-3 rounded-xl font-bold mt-6 shadow-lg"
+          >
+            Update Name
+          </button>
+        </form>
       </div>
     </div>
   );

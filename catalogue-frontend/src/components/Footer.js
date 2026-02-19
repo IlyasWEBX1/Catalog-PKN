@@ -1,52 +1,70 @@
 import { Link } from "react-router-dom";
-function Footer(){
-    return(
-        <footer className="bg-white rounded-xl shadow-sm m-2 dark:bg-gray-800">
-        <div className="p-4 bg-orange-800 text-white">
-           <div className="flex flex-wrap lg:flex-row items-center lg:justify-center space-y-2 lg:space-y-0 lg:space-x-2 gap-2">
-                <div className="footer-column">
-                    <h3>Shop</h3>
-                    <ul className="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
-                        <li><Link to="/Katalog" className="hover:underline me-4 md:me-6">All Products</Link></li>
-                        <li><Link to="/"className="hover:underline me-4 md:me-6">Featured</Link></li>
-                        <li><a href="#" className="hover:underline me-4 md:me-6">New Arrivals</a></li>
-                        <li><a href="#" className="hover:underline me-4 md:me-6">Discounted</a></li>
-                    </ul>
-                </div>
-                <div className="footer-column">
-                    <h3>Information</h3>
-                    <ul className="flex md:flex-row sm:flex-col items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
-                        <li><Link to="/About" className="hover:underline me-4 md:me-6">About Us</Link></li>
-                        <li><Link to="/Contact" className="hover:underline me-4 md:me-6">Contact Us</Link></li>
-                        <li><Link to="/Contact" className="hover:underline me-4 md:me-6">Terms &amp; Conditions</Link></li>
-                        <li><Link to="/Contact" className="hover:underline me-4 md:me-6">Privacy Policy</Link></li>
-                    </ul>
-                    </div>
-                <div className="footer-column mr-[100%]">
-                    <h3>Customer Service</h3>
-                    <ul className="flex flex-wrap items-center mt-3 text-sm font-medium text-gray-500 dark:text-gray-400 sm:mt-0">
-                        <li><Link to="/About" className="hover:underline me-4 md:me-6">FAQ</Link></li>
-                        <li><a href="#" className="hover:underline me-4 md:me-6">Shipping</a></li>
-                        <li><a href="#" className="hover:underline me-4 md:me-6">Returns</a></li>
-                        <li><a href="#" className="hover:underline me-4 md:me-6">Order Status</a></li>
-                    </ul>
-                </div>
-                <div className="footer-column flex flex-col self-end lg:text-right text-left">
-                    <h3>Contact Us</h3>
-                    <div><p>123 Main Street<br/>City, State 12345<br/>Phone: (123) 456-7890<br/>Email: info@catalogue.com</p></div>
-                    <div className="social-links">
-                        <a href="#"><i className="fab fa-facebook-f"></i></a>
-                        <a href="#"><i className="fab fa-twitter"></i></a>
-                        <a href="#"><i className="fab fa-instagram"></i></a>
-                        <a href="#"><i className="fab fa-pinterest"></i></a>
-                    </div>
-                </div>
+
+function Footer() {
+  return (
+    <footer className="bg-orange-900 text-white mt-10">
+      <div className="max-w-7xl mx-auto px-6 py-12">
+        {/* Main Grid Container */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+          
+          {/* Column 1: Shop */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold uppercase tracking-wider text-orange-200">Shop</h3>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/Katalog" className="hover:text-orange-300 transition">All Products</Link></li>
+              <li><Link to="/" className="hover:text-orange-300 transition">Featured</Link></li>
+              <li><a href="#" className="hover:text-orange-300 transition">New Arrivals</a></li>
+              <li><a href="#" className="hover:text-orange-300 transition">Discounted</a></li>
+            </ul>
+          </div>
+
+          {/* Column 2: Information */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold uppercase tracking-wider text-orange-200">Information</h3>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/About" className="hover:text-orange-300 transition">About Us</Link></li>
+              <li><Link to="/Contact" className="hover:text-orange-300 transition">Contact Us</Link></li>
+              <li><Link to="/Contact" className="hover:text-orange-300 transition">Terms & Conditions</Link></li>
+              <li><Link to="/Contact" className="hover:text-orange-300 transition">Privacy Policy</Link></li>
+            </ul>
+          </div>
+
+          {/* Column 3: Customer Service */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold uppercase tracking-wider text-orange-200">Customer Service</h3>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/About" className="hover:text-orange-300 transition">FAQ</Link></li>
+              <li><a href="#" className="hover:text-orange-300 transition">Shipping</a></li>
+              <li><a href="#" className="hover:text-orange-300 transition">Returns</a></li>
+              <li><a href="#" className="hover:text-orange-300 transition">Order Status</a></li>
+            </ul>
+          </div>
+
+          {/* Column 4: Contact */}
+          <div className="space-y-4">
+            <h3 className="text-lg font-bold uppercase tracking-wider text-orange-200">Contact Us</h3>
+            <div className="text-sm leading-relaxed text-orange-100">
+              <p>123 Main Street</p>
+              <p>City, State 12345</p>
+              <p className="mt-2">Phone: (123) 456-7890</p>
+              <p>Email: info@catalogue.com</p>
             </div>
-            <div className="copyright lg:text-center">
-                <p>© 2023 Catalogue. All Rights Reserved.</p>
+            {/* Social Icons */}
+            <div className="flex space-x-4 pt-2">
+              <a href="#" className="text-xl hover:text-orange-300 transition"><i className="fab fa-facebook"></i></a>
+              <a href="#" className="text-xl hover:text-orange-300 transition"><i className="fab fa-twitter"></i></a>
+              <a href="#" className="text-xl hover:text-orange-300 transition"><i className="fab fa-instagram"></i></a>
             </div>
+          </div>
         </div>
+
+        {/* Bottom Bar */}
+        <div className="border-t border-orange-800 mt-12 pt-8 text-center text-sm text-orange-200">
+          <p>© 2026 Catalogue. All Rights Reserved.</p>
+        </div>
+      </div>
     </footer>
-    )
+  );
 }
+
 export default Footer;

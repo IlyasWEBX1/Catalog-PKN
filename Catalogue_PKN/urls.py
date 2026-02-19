@@ -16,6 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.http import HttpResponse
 from Catalogue import urls as api_urls
 from django.conf import settings
 from django.conf.urls.static import static
@@ -25,8 +26,11 @@ from rest_framework_simplejwt.views import (
 )
 from Catalogue.views import MyTokenObtainPairView
 
+def home(request):
+    return HttpResponse("Hello, Django backend is running!")
 
 urlpatterns = [
+    path('', home),
     path('admin/', admin.site.urls),
     path('Catalogue_api/', include(api_urls)),
     path('Catalogue_api/token/', MyTokenObtainPairView.as_view(), name='token_obtain_pair'),   # login
