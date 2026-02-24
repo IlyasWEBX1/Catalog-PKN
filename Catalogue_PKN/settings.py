@@ -167,8 +167,16 @@ print(MEDIA_URL)
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # This makes WhiteNoise even faster by compressing files
+WHITENOISE_USE_FINDERS = True
+WHITENOISE_AUTOREFRESH = True
+
 STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
 }
+
+WHITENOISE_MANIFEST_STRICT = False
