@@ -49,7 +49,7 @@ function ItemCarousel({ items }) {
               {/* Image Container */}
               <div className="relative h-64 overflow-hidden">
                 <img
-                  src={`http://127.0.0.1:8000${item.gambar}`}
+                  src={`https://django-backend-production-a01f.up.railway.app/${item.gambar}`}
                   alt={item.nama}
                   className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
                 />

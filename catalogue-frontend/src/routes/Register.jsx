@@ -25,7 +25,7 @@ function RegisterPage() {
     e.preventDefault();
     try {
       await axios.post(
-        "http://localhost:8000/Catalogue_api/register/",
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/register/",
         formData,
       );
       alert("Pendaftaran Berhasil! Silakan Login.");

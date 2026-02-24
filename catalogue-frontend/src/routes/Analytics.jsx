@@ -126,23 +126,23 @@ const Analytics = () => {
 
     Promise.all([
       axios.get(
-        "http://127.0.0.1:8000/Catalogue_api/analytics/produk-terlaris/",
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/analytics/produk-terlaris/",
         params,
       ),
       axios.get(
-        "http://127.0.0.1:8000/Catalogue_api/analytics/kategori/",
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/analytics/kategori/",
         params,
       ),
       axios.get(
-        "http://127.0.0.1:8000/Catalogue_api/analytics/overview/",
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/analytics/overview/",
         params,
       ),
       axios.get(
-        "http://127.0.0.1:8000/Catalogue_api/analytics/product-multiline/",
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/analytics/product-multiline/",
         params,
       ),
       axios.get(
-        "http://127.0.0.1:8000/Catalogue_api/analytics/pendapatan-terbanyak/",
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/analytics/pendapatan-terbanyak/",
         params,
       ),
     ])

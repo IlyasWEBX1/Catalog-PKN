@@ -63,7 +63,7 @@ function HybridCarousel({ items, basis }) {
                     src={
                       item.gambar.startsWith("http")
                         ? item.gambar
-                        : `http://127.0.0.1:8000${item.gambar}`
+                        : `https://django-backend-production-a01f.up.railway.app/${item.gambar}`
                     }
                     alt={item.nama}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"

@@ -34,10 +34,18 @@ function AdminPage() {
   // --- ORIGINAL LOGIC (All Preserved) ---
   const refreshProducts = () => {
     Promise.all([
-      axios.get("http://localhost:8000/Catalogue_api/produk/"),
-      axios.get("http://localhost:8000/Catalogue_api/kategori/"),
-      axios.get("http://localhost:8000/Catalogue_api/pesan/"),
-      axios.get("http://localhost:8000/Catalogue_api/user/"),
+      axios.get(
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/",
+      ),
+      axios.get(
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/kategori/",
+      ),
+      axios.get(
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/pesan/",
+      ),
+      axios.get(
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/user/",
+      ),
     ])
       .then(([res, res2, res3, res4]) => {
         setProducts(res.data);

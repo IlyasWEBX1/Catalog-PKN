@@ -14,8 +14,12 @@ function Katalog() {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      axios.get("http://127.0.0.1:8000/Catalogue_api/produk/"),
-      axios.get("http://127.0.0.1:8000/Catalogue_api/kategori/"),
+      axios.get(
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/",
+      ),
+      axios.get(
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/kategori/",
+      ),
     ])
       .then(([produkResponse, kategoriResponse]) => {
         setProducts(produkResponse.data);
@@ -139,7 +143,7 @@ function Katalog() {
                   <Link to={`/ProductDetail/${product.id}`}>
                     <div className="relative h-64 overflow-hidden bg-gray-100">
                       <img
-                        src={`http://127.0.0.1:8000${product.gambar}`}
+                        src={`https://django-backend-production-a01f.up.railway.app${product.gambar}`}
                         alt={product.nama}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />

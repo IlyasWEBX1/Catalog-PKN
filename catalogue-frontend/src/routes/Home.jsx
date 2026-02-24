@@ -28,8 +28,12 @@ function Home() {
 
   useEffect(() => {
     Promise.all([
-      axios.get("http://localhost:8000/Catalogue_api/produk/"),
-      axios.get("http://localhost:8000/Catalogue_api/kategori/"),
+      axios.get(
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/",
+      ),
+      axios.get(
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/kategori/",
+      ),
     ])
       .then(([response, response2]) => {
         setProducts(response.data);

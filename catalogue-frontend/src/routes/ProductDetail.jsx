@@ -9,7 +9,8 @@ import ItemCarousel from "../components/slider";
 import ItemCarousel2 from "../components/slider2";
 import HybridCarousel from "../components/slider3";
 
-const API_BASE = "http://127.0.0.1:8000/Catalogue_api";
+const API_BASE =
+  "https://django-backend-production-a01f.up.railway.app/Catalogue_api";
 
 function ProductDetail() {
   const { id } = useParams();

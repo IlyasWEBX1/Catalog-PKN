@@ -17,7 +17,7 @@ function LoginPage() {
 
     try {
       const res = await axios.post(
-        "http://localhost:8000/Catalogue_api/token/",
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/token/",
         { username, password },
       );
       const token = res.data.access;

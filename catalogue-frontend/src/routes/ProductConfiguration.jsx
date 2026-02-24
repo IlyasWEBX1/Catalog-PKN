@@ -35,11 +35,11 @@ const ProductConfiguration = () => {
         const headers = { Authorization: `Bearer ${token}` };
         const [prodRes, perfRes] = await Promise.all([
           axios.get(
-            `http://127.0.0.1:8000/Catalogue_api/produk/configuration/${id}/`,
+            `https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/configuration/${id}/`,
             { headers },
           ),
           axios.get(
-            `http://127.0.0.1:8000/Catalogue_api/produk/configuration/${id}/performance/`,
+            `https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/configuration/${id}/performance/`,
             { headers },
           ),
         ]);
