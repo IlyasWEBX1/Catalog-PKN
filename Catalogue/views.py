@@ -22,6 +22,39 @@ from rest_framework_simplejwt.authentication import JWTAuthentication
 import numpy as np
 
 # --- HELPER FUNCTIONS ---
+def calculate_content_similarity_with_score(target_product, candidate_queryset, weight=0.5):
+    """
+    Fungsi BARU: Mengembalikan List of Tuples (Produk, Skor) 
+    untuk kebutuhan tampilan API dan Data Skripsi.
+    """
+    if not candidate_queryset.exists():
+        return []
+
+    def create_soup(p):
+        nama = str(p.nama or "")
+        deskripsi = str(p.deskripsi or "")
+        merek = str(p.merek or "")
+        tag = str(p.tag or "")
+        return f"{nama} {deskripsi} {merek} {tag}".lower()
+
+    target_soup = create_soup(target_product)
+    candidate_soups = [create_soup(p) for p in candidate_queryset]
+    all_texts = [target_soup] + candidate_soups
+
+    vectorizer = CountVectorizer().fit_transform(all_texts)
+    vectors = vectorizer.toarray()
+    cosine_sim = cosine_similarity(vectors[0:1], vectors[1:]).flatten()
+
+    skor_final = []
+    for i, produk in enumerate(candidate_queryset):
+        score = cosine_sim[i]
+        # Logika Penambahan Bobot Kategori
+        if produk.kategori == target_product.kategori:
+            score += weight
+        skor_final.append((produk, score)) # Simpan Produk dan Skornya
+
+    skor_final.sort(key=lambda x: x[1], reverse=True)
+    return skor_final[:] # Mengembalikan semua data yang disortir
 
 def calculate_content_similarity(target_product, candidate_queryset, weight=0.5):
     """
@@ -182,10 +215,17 @@ class HybridRecommendationView(APIView):
 
         candidates = Produk.objects.exclude(id=target_product.id)
         recommendations = calculate_content_similarity(target_product, candidates, weight=0.5)
+        recommendations_with_score = calculate_content_similarity_with_score(target_product, candidates, weight=0.5)
         
         return Response({
             "target_basis": target_product.nama,
-            "data": ProdukSerializer(recommendations, many=True).data
+            "data": ProdukSerializer(recommendations, many=True).data,
+            "data_with_scores": [
+                {
+                    "produk": ProdukSerializer(p).data,
+                    "score": score
+                } for p, score in recommendations_with_score
+            ]
         })
 
 

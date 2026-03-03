@@ -26,6 +26,7 @@ from rest_framework_simplejwt.views import (
 )
 from Catalogue.views import MyTokenObtainPairView
 
+
 def home(request):
     return HttpResponse("Hello, Django backend is running!")
 

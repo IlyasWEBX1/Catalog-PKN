@@ -57,6 +57,3 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('interaction-logs/', views.interaction_log_create, name='interaction-log-create'),
 ]
-
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
