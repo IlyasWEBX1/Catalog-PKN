@@ -122,7 +122,7 @@ function AdminPage() {
       imgData.append("image", editedImage);
 
       const imgbbRes = await axios.post(
-        `https://api.imgbb.com/1/upload?key=YOUR_IMGBB_API_KEY`,
+        `https://api.imgbb.com/1/upload?key=a1650bd6a30b13f098d8eb7b933b9181`,
         imgData,
       );
 
@@ -180,7 +180,7 @@ function AdminPage() {
       imgData.append("image", newImage);
 
       const imgbbRes = await axios.post(
-        `https://api.imgbb.com/1/upload?key=YOUR_IMGBB_API_KEY`,
+        `https://api.imgbb.com/1/upload?key=a1650bd6a30b13f098d8eb7b933b9181`,
         imgData,
       );
 

@@ -141,26 +141,32 @@ function ProductDetail() {
 
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    Object.keys(editForm).forEach((key) => {
-      if (key === "gambar" && !editForm[key]) return;
-      formData.append(key, editForm[key]);
-    });
 
     try {
-      await axios.patch(`${API_BASE}/produk/${editingId}/`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
+      await axios.patch(
+        `${API_BASE}/produk/${editingId}/`,
+        {
+          nama: editForm.nama,
+          harga: editForm.harga,
+          stok: editForm.stok,
+          deskripsi: editForm.deskripsi,
+          kategori: editForm.kategori,
+          gambar: editForm.gambar, // should be URL string, not file
         },
-      });
-      // Update UI lokal agar instan
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
       setProduct({
         ...product,
         ...editForm,
         harga: Number(editForm.harga),
         stok: Number(editForm.stok),
       });
+
       setEditingId(null);
     } catch (err) {
       console.error("Update failed", err.response?.data);

@@ -143,7 +143,7 @@ function Katalog() {
                   <Link to={`/ProductDetail/${product.id}`}>
                     <div className="relative h-64 overflow-hidden bg-gray-100">
                       <img
-                        src={`https://django-backend-production-a01f.up.railway.app${product.gambar}`}
+                        src={`https://django-backend-production-a01f.up.railway.app/${product.gambar}`}
                         alt={product.nama}
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                       />
