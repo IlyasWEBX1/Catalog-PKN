@@ -62,27 +62,36 @@ function AdminPage() {
 
   const handleDelete = (id) => {
     axios
-      .delete(`http://localhost:8000/Catalogue_api/produk/${id}/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .delete(
+        `https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/${id}/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      )
       .then(() => refreshProducts())
       .catch((err) => console.error("Delete error:", err));
   };
 
   const handleDeleteCategory = (id) => {
     axios
-      .delete(`http://localhost:8000/Catalogue_api/kategori/${id}/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .delete(
+        `https://django-backend-production-a01f.up.railway.app/Catalogue_api/kategori/${id}/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      )
       .then(() => refreshProducts())
       .catch((err) => console.error("Delete error:", err));
   };
 
   const handleDeletePesan = (id) => {
     axios
-      .delete(`http://localhost:8000/Catalogue_api/pesan/${id}/`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
+      .delete(
+        `https://django-backend-production-a01f.up.railway.app/Catalogue_api/pesan/${id}/`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      )
       .then(() => refreshProducts())
       .catch((err) => console.error("Delete error:", err));
   };
@@ -102,43 +111,51 @@ function AdminPage() {
     setEditedCategoryName(category.nama);
   };
 
-  const handleUpdate = (e) => {
+  const handleUpdate = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("nama", editedName);
-    formData.append("harga", editedPrice);
-    formData.append("kategori", EditedCategory);
-    formData.append("deskripsi", editedDesc);
-    formData.append("stok", editedStock);
-    if (editedImage && editedImage instanceof File && editedImage.size > 0) {
-      formData.append("gambar", editedImage);
-    }
-    axios
-      .patch(
-        `http://localhost:8000/Catalogue_api/produk/${editingId}/`,
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
-      .then(() => {
-        setEditingId(null);
-        setEditedImage(null);
-        refreshProducts();
-      })
-      .catch((err) =>
-        console.error("Update failed:", err.response?.data || err),
+
+    let imageUrl = editedImage;
+
+    // If user selected a new file, upload to ImgBB first
+    if (editedImage && editedImage instanceof File) {
+      const imgData = new FormData();
+      imgData.append("image", editedImage);
+
+      const imgbbRes = await axios.post(
+        `https://api.imgbb.com/1/upload?key=YOUR_IMGBB_API_KEY`,
+        imgData,
       );
+
+      imageUrl = imgbbRes.data.data.url;
+    }
+
+    await axios.patch(
+      `https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/${editingId}/`,
+      {
+        nama: editedName,
+        harga: editedPrice,
+        kategori: EditedCategory,
+        deskripsi: editedDesc,
+        stok: editedStock,
+        gambar: imageUrl, // now always URL
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+
+    setEditingId(null);
+    setEditedImage(null);
+    refreshProducts();
   };
 
   const handleCategoryUpdate = (e) => {
     e.preventDefault();
     axios
       .put(
-        `http://localhost:8000/Catalogue_api/kategori/${editingCategoryId}/`,
+        `https://django-backend-production-a01f.up.railway.app/Catalogue_api/kategori/${editingCategoryId}/`,
         { nama: editedCategoryName },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -153,42 +170,55 @@ function AdminPage() {
       );
   };
 
-  const handleAddProduct = (e) => {
+  const handleAddProduct = async (e) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("nama", newName);
-    formData.append("harga", newPrice);
-    formData.append("stok", newStock);
-    formData.append("kategori", newCategory);
-    formData.append("deskripsi", newDesc);
-    if (newImage) formData.append("gambar", newImage);
-    axios
-      .post("http://localhost:8000/Catalogue_api/produk/", formData, {
+
+    let imageUrl = "";
+
+    if (newImage) {
+      const imgData = new FormData();
+      imgData.append("image", newImage);
+
+      const imgbbRes = await axios.post(
+        `https://api.imgbb.com/1/upload?key=YOUR_IMGBB_API_KEY`,
+        imgData,
+      );
+
+      imageUrl = imgbbRes.data.data.url;
+    }
+
+    await axios.post(
+      "https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/",
+      {
+        nama: newName,
+        harga: newPrice,
+        stok: newStock,
+        kategori: newCategory,
+        deskripsi: newDesc,
+        gambar: imageUrl,
+      },
+      {
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
         },
-      })
-      .then(() => {
-        setNewName("");
-        setNewPrice("");
-        setNewStock("");
-        setNewCategory("");
-        setNewDesc("");
-        setNewImage(null);
-        refreshProducts();
-        setActiveTab("products");
-      })
-      .catch((err) =>
-        console.error("Add product failed:", err.response?.data || err),
-      );
+      },
+    );
+
+    setNewName("");
+    setNewPrice("");
+    setNewStock("");
+    setNewCategory("");
+    setNewDesc("");
+    setNewImage(null);
+    refreshProducts();
+    setActiveTab("products");
   };
 
   const handleAddCategory = (e) => {
     e.preventDefault();
     axios
       .post(
-        "http://localhost:8000/Catalogue_api/kategori/",
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/kategori/",
         { nama: newCategoryName },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -207,7 +237,7 @@ function AdminPage() {
   const handleConfirm = (produkId, pesanId) => {
     axios
       .post(
-        `http://localhost:8000/Catalogue_api/konfirmasi-pesanan/${produkId}/${pesanId}`,
+        `https://django-backend-production-a01f.up.railway.app/Catalogue_api/konfirmasi-pesanan/${produkId}/${pesanId}`,
       )
       .then(() => refreshProducts())
       .catch((err) => {
@@ -511,10 +541,11 @@ function AdminPage() {
                       />
                     </div>
                     <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => setNewImage(e.target.files[0])}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-white"
+                      type="text"
+                      placeholder="Image URL (ImgBB direct link)"
+                      value={newImage}
+                      onChange={(e) => setNewImage(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200"
                     />
                     <select
                       value={newCategory}
