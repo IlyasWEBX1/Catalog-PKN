@@ -1,4 +1,6 @@
 from rest_framework import routers
+
+from Catalogue_PKN import settings
 from . import views
 from .views import HybridRecommendationView, KategoriViewSet, ProdukDetail, RegisterView, UserViewSet, PesanViewSet, UserDetail, ProdukStudioViewSet
 from django.urls import path, include
@@ -55,3 +57,6 @@ urlpatterns = [
     path('register/', RegisterView.as_view(), name='register'),
     path('interaction-logs/', views.interaction_log_create, name='interaction-log-create'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
