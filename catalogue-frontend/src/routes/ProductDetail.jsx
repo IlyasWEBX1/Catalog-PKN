@@ -215,11 +215,7 @@ function ProductDetail() {
 
             <div className="relative group w-full max-w-md">
               <img
-                src={
-                  product.gambar.startsWith("http")
-                    ? product.gambar
-                    : `${IMAGE_BASE}${product.gambar}`
-                }
+                src={product.gambar}
                 alt={product.nama}
                 className="w-full h-auto object-contain rounded-lg transition-transform duration-300 group-hover:scale-105"
               />
