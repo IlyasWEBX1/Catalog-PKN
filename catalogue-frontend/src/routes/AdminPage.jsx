@@ -22,6 +22,22 @@ function AdminPage() {
   const [editedDesc, setEditedDesc] = useState("");
   const [EditedCategory, setEditedCategory] = useState(null);
   const [editedImage, setEditedImage] = useState(null);
+  // Untuk menampung File dari input
+
+  // INI YANG HILANG (Penyebab error editForm):
+  const [editForm, setEditForm] = useState({
+    nama: "",
+    harga: "",
+    stok: "",
+    deskripsi: "",
+    kategori: "",
+    gambar: "",
+  });
+
+  // Jika kamu berada di halaman Detail Produk, tambahkan ini:
+  // Jika kamu di halaman List Admin biasa, variabel 'product' biasanya
+  // tidak dipakai di handleUpdate (cukup refreshProducts)
+  const [product, setProduct] = useState(null);
 
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newName, setNewName] = useState("");
