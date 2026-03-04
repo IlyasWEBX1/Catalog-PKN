@@ -200,35 +200,30 @@ const Analytics = () => {
     const last = chartData[chartData.length - 1];
     const metrics = {};
 
-    const calculateProperGrowth = (start, end) => {
-      // 1. Jika tetap 0, pertumbuhan adalah 0%
+    const calculateGrowth = (start, end) => {
+      // Jika keduanya 0 → tidak ada perubahan
       if (start === 0 && end === 0) return 0;
 
-      // 2. Jika dari 0 ke suatu angka (misal 0 ke 2):
-      // Kita asumsikan start adalah 1 (atau langsung end * 100)
-      // agar menghasilkan persentase (2/1 * 100 = 200%)
-      if (start === 0 && end > 0) {
-        return end * 100;
-      }
+      // Jika start = 0 dan end > 0 → pertumbuhan baru
+      if (start === 0 && end > 0) return null;
 
-      // 3. Rumus standar untuk start > 0
-      // ((Akhir - Awal) / Awal) * 100
+      // Jika start > 0 → rumus standar
       const growth = ((end - start) / start) * 100;
 
       return isFinite(growth) ? growth : 0;
     };
 
     productKeys.forEach((key) => {
-      const startRev = first[`${key}_revenue`] || 0;
-      const endRev = last[`${key}_revenue`] || 0;
+      const startRev = first[`${key}_revenue`] ?? 0;
+      const endRev = last[`${key}_revenue`] ?? 0;
 
-      // Pastikan key qty sesuai dengan data anda (_sales atau _qty)
-      const startQty = first[`${key}_sales`] || first[`${key}_qty`] || 0;
-      const endQty = last[`${key}_sales`] || last[`${key}_qty`] || 0;
+      const startQty = first[`${key}_sales`] ?? first[`${key}_qty`] ?? 0;
+
+      const endQty = last[`${key}_sales`] ?? last[`${key}_qty`] ?? 0;
 
       metrics[key] = {
-        revGrowth: calculateProperGrowth(startRev, endRev),
-        qtyGrowth: calculateProperGrowth(startQty, endQty),
+        revGrowth: calculateGrowth(startRev, endRev),
+        qtyGrowth: calculateGrowth(startQty, endQty),
       };
     });
 
