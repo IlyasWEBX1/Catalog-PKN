@@ -301,7 +301,7 @@ def konfirmasi_pesanan(request, produk_id, pesan_id):
         pesan, produk = Pesan.objects.get(id=pesan_id), Produk.objects.get(id=produk_id)
         jumlah = int(request.data.get('jumlah', 1))
         if produk.stok < jumlah: return Response({'error': 'Stok tidak mencukupi'}, status=400)
-        laporan = Laporan.objects.create(user_admin=request.user if request.user.is_authenticated else None, tanggal=date.today(), nama_pembeli=pesan.user.nama if pesan.user else "Guest")
+        laporan = Laporan.objects.create(user_admin=request.user if request.user.is_authenticated else None, tanggal=pesan.waktu.date(), nama_pembeli=pesan.user.nama if pesan.user else "Guest")
         TransactionDetail.objects.create(transaksi=laporan, produk=produk, jumlah_terjual=jumlah, harga_satuan=produk.harga, total_penjualan_detail=produk.harga * jumlah)
         laporan.total_penjualan_keseluruhan = produk.harga * jumlah
         laporan.save()
