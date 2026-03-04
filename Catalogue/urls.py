@@ -4,7 +4,7 @@ from Catalogue_PKN import settings
 from . import views
 from .views import HybridRecommendationView, KategoriViewSet, ProdukDetail, RegisterView, UserViewSet, PesanViewSet, UserDetail, ProdukStudioViewSet
 from django.urls import path, include
-from .views import ProdukList, send_message, konfirmasi_pesanan, most_bought_products
+from .views import ProdukList, send_message, konfirmasi_pesanan, most_bought_products, inject_laporan
 from .analytics_views import (
     produk_terlaris,
     tren_penjualan_bulanan,
@@ -56,4 +56,5 @@ urlpatterns = [
     path('recommendations/hybrid/', HybridRecommendationView.as_view(), name='hybrid-recommendation'),
     path('register/', RegisterView.as_view(), name='register'),
     path('interaction-logs/', views.interaction_log_create, name='interaction-log-create'),
+    path('inject-laporan/', inject_laporan, name='inject-laporan'),
 ]

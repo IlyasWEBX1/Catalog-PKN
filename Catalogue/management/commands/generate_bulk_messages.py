@@ -2,43 +2,54 @@ import requests
 import random
 from datetime import datetime, timedelta
 
-# URL Production Railway Anda
 API_BASE = "https://django-backend-production-a01f.up.railway.app/Catalogue_api"
 
-def get_random_past_date():
-    """Menghasilkan string tanggal acak antara 1 sampai 30 hari yang lalu"""
-    random_days = random.randint(365, 365*2)  # 1-30 hari lalu
-    past_date = datetime.now() - timedelta(days=random_days)
-    # Format yang dikenali Django: YYYY-MM-DD HH:MM:SS
-    return past_date.strftime('%Y-%m-%d %H:%M:%S')
+def get_historical_date():
+    # Menghasilkan tanggal acak antara tahun 2021 hingga 2024
+    start_date = datetime(2021, 1, 1)
+    end_date = datetime(2024, 12, 31)
+    time_between_dates = end_date - start_date
+    days_between_dates = time_between_dates.days
+    random_number_of_days = random.randrange(days_between_dates)
+    random_date = start_date + timedelta(days=random_number_of_days)
+    return random_date.strftime('%Y-%m-%d')
 
-def generate_bulk_messages():
-    # 1. Setup Data (Sesuaikan ID produk yang ada di DB Anda)
-    product_ids = 5
-    user_id = 4 # ID untuk 'ilyas2'
-    
-    print(f"🚀 Memulai pengiriman pesan ke {API_BASE}/send-message/...")
+def inject_bulk_laporan(n=20):
+    # Setup Data Dasar
+    product_list = [
+        {"id": 5, "nama": "Maroon Series - Panci", "harga": 780000},
+        {"id": 3, "nama": "Pan Cake", "harga": 350000},
+    ]
+    user_admin_id = 1 # Sesuaikan ID Admin Anda
 
-    for i in range(5): # Kita kirim 20 pesan acak
-        random_date = get_random_past_date()
-        
+    print(f"🚀 Memulai Injeksi {n} Laporan Historis ke {API_BASE}/inject-laporan/...")
+
+    for i in range(n):
+        produk = random.choice(product_list)
+        qty = random.randint(1, 5)
+        total_rev = produk['harga'] * qty
+        tgl = get_historical_date()
+
         payload = {
-            "product_id": product_ids,
-            "message": f"Order Simulasi (Data Historis {random_date})",
-            "user_id": user_id,
-            "waktu_custom": random_date  # Field tambahan untuk ditangkap Backend
+            "user_admin_id": user_admin_id,
+            "tanggal": tgl,
+            "nama_pembeli": f"Pembeli Historis {i+1}",
+            "product_id": produk['id'],
+            "qty": qty,
+            "harga_satuan": produk['harga'],
+            "total_revenue": total_rev
         }
-        
+
         try:
-            # Kirim POST request
-            response = requests.post(f"{API_BASE}/send-message/", json=payload)
+            # Gunakan endpoint baru inject-laporan
+            response = requests.post(f"{API_BASE}/inject-laporan/", json=payload)
             
-            if response.status_code in [200, 201]:
-                print(f"✅ Berhasil [{i+1}]: Produk {payload['product_id']} | Tanggal: {random_date}")
+            if response.status_code == 201:
+                print(f"✅ [{i+1}] Sukses: {produk['nama']} | Tanggal: {tgl} | Rp{total_rev}")
             else:
-                print(f"❌ Gagal [{i+1}]: {response.status_code} - {response.text}")
+                print(f"❌ [{i+1}] Gagal: {response.text}")
         except Exception as e:
             print(f"🔥 Error: {e}")
 
 if __name__ == "__main__":
-    generate_bulk_messages()
+    inject_bulk_laporan(30) # Suntik 30 data sekaligus

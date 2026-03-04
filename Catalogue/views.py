@@ -333,3 +333,30 @@ def interaction_log_create(request):
         )
         return Response({"status": "Created"}, status=201)
     except Exception as e: return Response({"error": str(e)}, status=400)
+
+# views.py
+@api_view(['POST'])
+@permission_classes([AllowAny]) # Sesuaikan dengan kebutuhan security Anda
+def inject_laporan(request):
+    try:
+        data = request.data
+        # 1. Buat Header Laporan
+        laporan = Laporan.objects.create(
+            user_admin_id=data.get("user_admin_id"),
+            tanggal=data.get("tanggal"),
+            nama_pembeli=data.get("nama_pembeli", "Dummy Buyer"),
+            total_penjualan_keseluruhan=data.get("total_revenue", 0)
+        )
+        
+        # 2. Buat Detail Transaksi agar muncul di chart product-multiline
+        TransactionDetail.objects.create(
+            transaksi=laporan,
+            produk_id=data.get("product_id"),
+            jumlah_terjual=data.get("qty", 1),
+            harga_satuan=data.get("harga_satuan", 0),
+            total_penjualan_detail=data.get("total_revenue", 0)
+        )
+        
+        return Response({"message": f"Injeksi Berhasil ID {laporan.id}"}, status=201)
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
