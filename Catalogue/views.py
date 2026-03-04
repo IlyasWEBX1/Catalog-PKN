@@ -308,6 +308,7 @@ def konfirmasi_pesanan(request, produk_id, pesan_id):
         produk.stok -= jumlah
         produk.save()
         pesan.delete()
+        print(pesan.waktu, produk.nama, jumlah, request.user.username if request.user.is_authenticated else "Guest")
         return Response({'message': 'Pesanan berhasil dikonfirmasi'}, status=201)
     except Exception as e: return Response({'error': str(e)}, status=404)
 
