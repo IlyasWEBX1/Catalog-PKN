@@ -114,41 +114,64 @@ function AdminPage() {
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    let imageUrl = editedImage;
+    try {
+      // 1. Tentukan URL Gambar Awal (dari state editForm)
+      let imageUrl = editForm.gambar;
 
-    // If user selected a new file, upload to ImgBB first
-    if (editedImage && editedImage instanceof File) {
-      const imgData = new FormData();
-      imgData.append("image", editedImage);
+      // 2. Jika user memilih file baru (object File), upload ke ImgBB
+      if (editedImage && editedImage instanceof File) {
+        const imgData = new FormData();
+        imgData.append("image", editedImage);
 
-      const imgbbRes = await axios.post(
-        `https://api.imgbb.com/1/upload?key=a1650bd6a30b13f098d8eb7b933b9181`,
-        imgData,
+        const imgbbRes = await axios.post(
+          `https://api.imgbb.com/1/upload?key=a1650bd6a30b13f098d8eb7b933b9181`,
+          imgData,
+        );
+
+        imageUrl = imgbbRes.data.data.url;
+      }
+
+      // 3. Kirim Patch Request (Struktur sama dengan handleUpdateSubmit)
+      await axios.patch(
+        `https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/${editingId}/`,
+        {
+          nama: editForm.nama,
+          harga: editForm.harga,
+          stok: editForm.stok,
+          deskripsi: editForm.deskripsi,
+          kategori: editForm.kategori,
+          gambar: imageUrl, // Gunakan URL hasil upload atau URL lama
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
       );
 
-      imageUrl = imgbbRes.data.data.url;
+      // 4. Cleanup State (Sama dengan handleUpdateSubmit)
+      setEditingId(null);
+      setEditedImage(null); // Reset file picker
+
+      // Jika ini di halaman list produk:
+      if (typeof refreshProducts === "function") refreshProducts();
+
+      // Jika ini di halaman detail produk (update local state):
+      if (typeof setProduct === "function") {
+        setProduct({
+          ...product,
+          ...editForm,
+          gambar: imageUrl,
+          harga: Number(editForm.harga),
+          stok: Number(editForm.stok),
+        });
+      }
+
+      alert("Produk berhasil diperbarui!");
+    } catch (err) {
+      console.error("Update failed", err.response?.data || err.message);
+      alert("Gagal memperbarui produk.");
     }
-
-    await axios.patch(
-      `https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/${editingId}/`,
-      {
-        nama: editedName,
-        harga: editedPrice,
-        kategori: EditedCategory,
-        deskripsi: editedDesc,
-        stok: editedStock,
-        gambar: imageUrl, // now always URL
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    );
-
-    setEditingId(null);
-    setEditedImage(null);
-    refreshProducts();
   };
 
   const handleCategoryUpdate = (e) => {

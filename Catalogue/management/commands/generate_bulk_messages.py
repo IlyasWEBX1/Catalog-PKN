@@ -17,7 +17,7 @@ def get_historical_date():
 def inject_bulk_laporan(n=20):
     # Setup Data Dasar
     product_list = [
-        {"id": 5, "nama": "Maroon Series - Panci", "harga": 780000},
+        {"id": 5, "nama": "Maroon Series - Panci", "harga": 790000},
         {"id": 3, "nama": "Pan Cake", "harga": 350000},
     ]
     user_admin_id = 1 # Sesuaikan ID Admin Anda
