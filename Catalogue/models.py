@@ -56,17 +56,14 @@ class Produk(models.Model):
 
 # 4A. MODEL TRANSAKSI PENJUALAN (Pengganti Laporan - Header Transaksi)
 class Laporan(models.Model):
-    """
-    Model Header Transaksi Penjualan. Diinput oleh Admin 
-    berdasarkan pesanan via WhatsApp.
-    """
     user_admin = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name='recorded_transactions')
     tanggal = models.DateField()
     nama_pembeli = models.CharField(max_length=100, blank=True, null=True)
-    total_penjualan_keseluruhan = models.DecimalField(max_digits=12, decimal_places=2, default=0) # Total dari semua detail
+    total_penjualan_keseluruhan = models.DecimalField(max_digits=12, decimal_places=2, default=0)
 
     def __str__(self):
-        return f"TRX-{self.id} pada {self.tanggal_transaksi}"
+        # Pastikan menggunakan self.tanggal, bukan self.tanggal_transaksi
+        return f"TRX-{self.id} pada {self.tanggal}"
 
 # 4B. DETAIL TRANSAKSI (Pengganti Laporan - Detail Produk yang Terjual)
 class TransactionDetail(models.Model):

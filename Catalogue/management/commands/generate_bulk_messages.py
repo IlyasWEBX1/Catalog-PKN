@@ -19,7 +19,7 @@ def generate_bulk_messages():
     
     print(f"🚀 Memulai pengiriman pesan ke {API_BASE}/send-message/...")
 
-    for i in range(20): # Kita kirim 20 pesan acak
+    for i in range(5): # Kita kirim 20 pesan acak
         random_date = get_random_past_date()
         
         payload = {
