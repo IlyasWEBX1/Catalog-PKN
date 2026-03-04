@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.conf import settings
+from django.utils import timezone
 
 # 1. MODEL PENGGUNA (ACTOR)
 class User(AbstractUser):
@@ -103,7 +104,7 @@ class Pesan(models.Model):
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
     produk = models.ForeignKey(Produk, on_delete=models.CASCADE)
-    waktu = models.DateTimeField(auto_now_add=True)
+    waktu = models.DateTimeField(default=timezone.now)
     isi_pesan = models.TextField()
     
     def __str__(self):

@@ -179,6 +179,7 @@ function ProductDetail() {
         product_id: product.id,
         message: whatsappMessage,
         user_id: currentUserId,
+        tanggal: new Date().toISOString(),
       });
       setShowWhatsAppModal(false);
       window.open(

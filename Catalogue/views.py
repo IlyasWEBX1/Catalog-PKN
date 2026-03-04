@@ -137,13 +137,24 @@ def send_message(request):
     product_id = request.data.get("product_id")
     message = request.data.get("message")
     user_id = request.data.get("user_id")
-    if not all([product_id, message]): return Response({"error": "Missing fields"}, status=400)
+    # TANGKAP TANGGAL DARI REQUEST
+    tanggal_custom = request.data.get("tanggal") 
+
+    if not all([product_id, message]): 
+        return Response({"error": "Missing fields"}, status=400)
+
     try:
         user = User.objects.get(id=user_id) if user_id else User.objects.get(username="guest")
     except User.DoesNotExist:
         return Response({"error": "User not found"}, status=404)
-    Pesan.objects.create(user=user, produk_id=product_id, isi_pesan=message)
-    return Response({"message": "Pesan created"})
+
+    # BUAT PESAN DENGAN TANGGAL CUSTOM JIKA ADA
+    pesan = Pesan(user=user, produk_id=product_id, isi_pesan=message)
+    if tanggal_custom:
+        pesan.waktu = tanggal_custom # Pastikan nama field di model Pesan adalah 'waktu'
+    pesan.save()
+
+    return Response({"message": f"Pesan created on {pesan.waktu}"})
 
 
 # --- PRODUCT CORE VIEWS ---
