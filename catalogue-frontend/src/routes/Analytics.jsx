@@ -196,34 +196,55 @@ const Analytics = () => {
   const productGrowthMetrics = useMemo(() => {
     if (!chartData || chartData.length < 2) return {};
 
-    const first = chartData[0];
-    const last = chartData[chartData.length - 1];
+    // Ambil tanggal pertama dan terakhir
+    const firstDate = new Date(chartData[0].tanggal);
+    const lastDate = new Date(chartData[chartData.length - 1].tanggal);
+
+    // Tentukan titik tengah berdasarkan waktu
+    const midTime = (firstDate.getTime() + lastDate.getTime()) / 2;
+    const midDate = new Date(midTime);
+
+    // Bagi berdasarkan tanggal, bukan index
+    const firstPeriod = chartData.filter(
+      (item) => new Date(item.tanggal) <= midDate,
+    );
+
+    const secondPeriod = chartData.filter(
+      (item) => new Date(item.tanggal) > midDate,
+    );
+
     const metrics = {};
 
-    const calculateGrowth = (start, end) => {
-      // Jika keduanya 0 → tidak ada perubahan
-      if (start === 0 && end === 0) return 0;
+    const sum = (arr, key) =>
+      arr.reduce((acc, item) => acc + (item[key] ?? 0), 0);
 
-      // Jika start = 0 dan end > 0 → pertumbuhan baru
-      if (start === 0 && end > 0) return null;
-
-      // Jika start > 0 → rumus standar
-      const growth = ((end - start) / start) * 100;
-
-      return isFinite(growth) ? growth : 0;
+    const calculateGrowth = (startTotal, endTotal) => {
+      if (startTotal === 0 && endTotal === 0) return 0;
+      if (startTotal === 0 && endTotal > 0) return null; // Undefined
+      return ((endTotal - startTotal) / startTotal) * 100;
     };
 
     productKeys.forEach((key) => {
-      const startRev = first[`${key}_revenue`] ?? 0;
-      const endRev = last[`${key}_revenue`] ?? 0;
+      const revKey = `${key}_revenue`;
+      const qtyKey1 = `${key}_sales`;
+      const qtyKey2 = `${key}_qty`;
 
-      const startQty = first[`${key}_sales`] ?? first[`${key}_qty`] ?? 0;
+      const firstRevTotal = sum(firstPeriod, revKey);
+      const secondRevTotal = sum(secondPeriod, revKey);
 
-      const endQty = last[`${key}_sales`] ?? last[`${key}_qty`] ?? 0;
+      const firstQtyTotal = firstPeriod.reduce(
+        (acc, item) => acc + (item[qtyKey1] ?? item[qtyKey2] ?? 0),
+        0,
+      );
+
+      const secondQtyTotal = secondPeriod.reduce(
+        (acc, item) => acc + (item[qtyKey1] ?? item[qtyKey2] ?? 0),
+        0,
+      );
 
       metrics[key] = {
-        revGrowth: calculateGrowth(startRev, endRev),
-        qtyGrowth: calculateGrowth(startQty, endQty),
+        revGrowth: calculateGrowth(firstRevTotal, secondRevTotal),
+        qtyGrowth: calculateGrowth(firstQtyTotal, secondQtyTotal),
       };
     });
 
