@@ -70,12 +70,21 @@ def tren_penjualan_bulanan(request):
     return JsonResponse(list(data), safe=False)
 
 def penjualan_per_kategori(request):
+    filters = get_date_range(request)
+
     data = (
         TransactionDetail.objects
-        .values(kategori_terlaris=F('produk__kategori__nama'))
-        .annotate(total_terjual=Sum('jumlah_terjual'))
-        .order_by('-total_terjual')
+        .filter(**filters)
+        .values(
+            kategori_nama=F("produk__kategori__nama")
+        )
+        .annotate(
+            total_terjual=Sum("jumlah_terjual"),
+            total_revenue=Sum("total_penjualan_detail"),
+        )
+        .order_by("-total_terjual")
     )
+
     return JsonResponse(list(data), safe=False)
 
 def revenue_trend(request):
