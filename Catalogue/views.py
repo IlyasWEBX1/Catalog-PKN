@@ -64,6 +64,8 @@ def calculate_content_similarity(target_product, candidate_queryset, weight=0.5)
     if not candidate_queryset.exists():
         return []
 
+    # Tahap 1: CONTENT ANALYZER / FEATURE EXTRACTION
+    # Mengubah data tidak terstruktur menjadi representasi profil item (Item Profile).
     def create_soup(p):
         nama = str(p.nama or "")
         deskripsi = str(p.deskripsi or "")
@@ -71,11 +73,13 @@ def calculate_content_similarity(target_product, candidate_queryset, weight=0.5)
         tag = str(p.tag or "")
         return f"{nama} {deskripsi} {merek} {tag}".lower()
 
+    # Tahap 2: REPRESENTASI VECTOR SPACE MODEL (VSM)
     target_soup = create_soup(target_product)
     candidate_soups = [create_soup(p) for p in candidate_queryset]
     all_texts = [target_soup] + candidate_soups
 
-    # Hitung Cosine Similarity
+   # Tahap 3: TOKENIZATION & WEIGHTING (Vectorization)
+    # CountVectorizer mengubah teks menjadi vektor frekuensi kata (Term Frequency).
     vectorizer = CountVectorizer().fit_transform(all_texts)
     vectors = vectorizer.toarray()
     cosine_sim = cosine_similarity(vectors[0:1], vectors[1:]).flatten()

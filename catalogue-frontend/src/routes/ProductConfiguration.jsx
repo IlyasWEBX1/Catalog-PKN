@@ -124,7 +124,7 @@ const ProductConfiguration = () => {
                 <div className="p-2 bg-blue-600 rounded-xl text-white">
                   <FiStar size={20} />
                 </div>
-                <h4 className="text-lg font-bold">Studio Insight</h4>
+                <h4 className="text-lg font-bold">Business Insight</h4>
               </div>
               <p className="text-slate-300 text-sm leading-relaxed font-medium mb-6">
                 {performance?.sales_performance?.quantity_sold > 0
@@ -206,7 +206,7 @@ const ProductConfiguration = () => {
             </section>
 
             {/* Inventory Value Section */}
-            <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-sm flex items-center justify-between">
+            {/* <div className="bg-white border border-slate-200 rounded-[2.5rem] p-8 shadow-sm flex items-center justify-between">
               <div>
                 <p className="text-slate-400 font-black uppercase text-[10px] tracking-[0.2em] mb-1">
                   Total Inventory Asset Value
@@ -228,7 +228,7 @@ const ProductConfiguration = () => {
                   Warehouse Status: Healthy
                 </span>
               </div>
-            </div>
+            </div> */}
           </main>
         </div>
       </div>

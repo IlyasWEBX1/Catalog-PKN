@@ -23,11 +23,45 @@ def get_dynamic_data(current_date):
 
 def inject_clean_history():
     product_list = [
-        {"id": 5, "nama": "Maroon Series - Panci", "harga": 780000},
-        {"id": 3, "nama": "Pan Cake", "harga": 350000},
+        {
+        "id": 3,
+        "nama": "Maroon Series - Panci",
+        "harga": 790000.00,
+    },
+    {
+        "id": 5,
+        "nama": "Pan Cake",
+        "harga": 350000.00,
+
+    },
+    {
+        "id": 6,
+        "nama": "Panci CKA Pot",
+        "harga": 450000.00,
+    },
+    {
+        "id": 7,
+        "nama": "Panci Grill Work",
+        "harga": 600000.00,
+    },
+    {
+        "id": 8,
+        "nama": "Wajan Anti Lengket Premium",
+        "harga": 250000.00,
+    },
+    {
+        "id": 9,
+        "nama": "Panci Stainless 3 Liter",
+        "harga": 180000.00,
+    },
+    {
+        "id": 10,
+        "nama": "Sepatula Kayu Premium",
+        "harga": 100000.00,
+    }
     ]
     
-    start_date = datetime(2021, 1, 1)
+    start_date = datetime(2025, 1, 1)
     end_date = datetime.now()
     current_date = start_date
 
