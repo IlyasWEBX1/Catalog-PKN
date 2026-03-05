@@ -1,25 +1,17 @@
-import { Line } from "react-chartjs-2";
+import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  PointElement, // Tambahkan ini untuk titik
-  LineElement, // Tambahkan ini untuk garis
+  BarElement,
   Tooltip,
   Legend,
 } from "chart.js";
 
-// Registrasi komponen Line
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Tooltip,
-  Legend,
-);
+ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
 const ProductRevenueChart = ({ data = [] }) => {
+  // Guarding: Jika data bukan array atau kosong
   if (!Array.isArray(data) || data.length === 0) {
     return (
       <div className="h-[400px] flex items-center justify-center bg-gray-50 rounded-lg border-2 border-dashed">
@@ -31,25 +23,24 @@ const ProductRevenueChart = ({ data = [] }) => {
   }
 
   const chartData = {
+    // Sumbu X: Nama-nama produk
     labels: data.map((item) => item.nama_produk),
     datasets: [
       {
         label: "Revenue (Rp)",
         data: data.map((item) => Number(item.total_revenue || 0)),
-        borderColor: "rgb(54, 162, 235)", // Warna garis biru
-        backgroundColor: "rgba(54, 162, 235, 0.5)", // Warna titik
-        tension: 0.4, // Membuat garis sedikit melengkung (smooth)
-        pointRadius: 5,
-        yAxisID: "y",
+        backgroundColor: "rgba(54, 162, 235, 0.6)",
+        borderColor: "rgb(54, 162, 235)",
+        borderWidth: 1,
+        yAxisID: "y", // Menggunakan sumbu Y kiri
       },
       {
         label: "Unit Terjual",
         data: data.map((item) => item.total_terjual || 0),
-        borderColor: "rgb(255, 99, 132)", // Warna garis merah
-        backgroundColor: "rgba(255, 99, 132, 0.5)",
-        tension: 0.4,
-        pointRadius: 5,
-        yAxisID: "y1",
+        backgroundColor: "rgba(255, 99, 132, 0.6)",
+        borderColor: "rgb(255, 99, 132)",
+        borderWidth: 1,
+        yAxisID: "y1", // Menggunakan sumbu Y kanan agar skala tidak jomplang
       },
     ],
   };
@@ -76,7 +67,7 @@ const ProductRevenueChart = ({ data = [] }) => {
         display: true,
         position: "right",
         title: { display: true, text: "Unit Terjual" },
-        grid: { drawOnChartArea: false },
+        grid: { drawOnChartArea: false }, // Agar grid tidak tumpang tindih
       },
     },
   };
@@ -84,9 +75,9 @@ const ProductRevenueChart = ({ data = [] }) => {
   return (
     <div className="h-[500px] bg-white p-6 rounded-lg shadow-sm border border-gray-100">
       <h2 className="font-bold text-lg mb-4 text-gray-700">
-        Tren Performa Per Produk
+        Performa Penjualan Per Produk
       </h2>
-      <Line data={chartData} options={options} />
+      <Bar data={chartData} options={options} />
     </div>
   );
 };

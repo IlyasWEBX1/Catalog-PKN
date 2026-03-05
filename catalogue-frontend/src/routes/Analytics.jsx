@@ -4,6 +4,7 @@ import AdminDashboard from "../components/AdminMenu";
 import ProductRevenueChart from "../components/RevenueChart";
 import ProductMultiLineChart from "../components/RevenueDetailed";
 import formatMultiLineData from "../utils/formatMultiLineData";
+import CategoryPieChart from "../components/CategoryPieChart";
 import Footer from "../components/Footer";
 import ProductQuantityChart from "../components/ProductQuantityChart";
 // --- Helpers & Sub-Components (Defined before Analytics to avoid errors) ---
@@ -389,6 +390,10 @@ const Analytics = () => {
                 Category Distribution
               </h2>
               <div className="space-y-6">
+                <CategoryPieChart
+                  key={`${dateRange.start}-${dateRange.end}`}
+                  data={categoryData}
+                />
                 {categoryData.map((item, idx) => (
                   <div key={idx}>
                     <div className="flex justify-between text-sm mb-2">
@@ -396,7 +401,7 @@ const Analytics = () => {
                         {item.kategori_terlaris}
                       </span>
                       <span className="font-bold text-gray-800">
-                        {item.total_terjual}%
+                        {item.total_terjual}
                       </span>
                     </div>
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
