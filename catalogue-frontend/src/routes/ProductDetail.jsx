@@ -142,34 +142,37 @@ function ProductDetail() {
   const handleUpdateSubmit = async (e) => {
     e.preventDefault();
 
+    // Gunakan FormData karena ada file (gambar) yang akan diupload
+    const formData = new FormData();
+    formData.append("nama", editForm.nama);
+    formData.append("harga", editForm.harga);
+    formData.append("stok", editForm.stok);
+    formData.append("deskripsi", editForm.deskripsi);
+    formData.append("kategori", editForm.kategori);
+
+    // Cek jika ada file gambar baru yang dipilih
+    if (editForm.gambar) {
+      formData.append("gambar", editForm.gambar);
+    }
+
     try {
-      await axios.patch(
+      const response = await axios.patch(
         `${API_BASE}/produk/${editingId}/`,
-        {
-          nama: editForm.nama,
-          harga: editForm.harga,
-          stok: editForm.stok,
-          deskripsi: editForm.deskripsi,
-          kategori: editForm.kategori,
-          gambar: editForm.gambar, // should be URL string, not file
-        },
+        formData, // Kirim formData, bukan objek biasa
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data", // Header wajib untuk upload file
           },
         },
       );
 
-      setProduct({
-        ...product,
-        ...editForm,
-        harga: Number(editForm.harga),
-        stok: Number(editForm.stok),
-      });
-
+      // Update state produk dengan data terbaru dari server (termasuk URL Cloudinary baru)
+      setProduct(response.data);
       setEditingId(null);
     } catch (err) {
       console.error("Update failed", err.response?.data);
+      alert("Gagal mengupdate produk. Cek konsol untuk detail.");
     }
   };
 
