@@ -98,20 +98,31 @@ WSGI_APPLICATION = 'Catalogue_PKN.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 # Use this cleaner pattern to ensure Railway's DATABASE_URL is prioritized
-DATABASES = {
-    'default': dj_database_url.config(
-        default=os.getenv('DATABASE_URL'),
-        conn_max_age=600,
-        conn_health_checks=True, # Added for 2026/Django 5.x stability
-        ssl_require=True
-    )
-}
+# settings.py
+import os
+import dj_database_url
 
-# Fallback to SQLite only if DATABASE_URL is literally not set
-if not os.getenv('DATABASE_URL'):
-    DATABASES['default'] = {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Ambil dari environment variable Railway
+DATABASE_URL = os.getenv('DATABASE_URL')
+
+if DATABASE_URL:
+    # JIKA DI RAILWAY: Paksa pakai Postgres
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=True
+        )
+    }
+else:
+    # JIKA DI LOKAL (tanpa DATABASE_URL): Pakai SQLite
+    print("Database URL tidak ditemukan, menggunakan SQLite...")
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
     }
 
 

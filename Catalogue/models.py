@@ -89,7 +89,7 @@ class InteractionLog(models.Model):
     Mencatat interaksi pengguna (View/Klik) pada produk untuk analisis perilaku.
     """
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True)
-    produk = models.ForeignKey(Produk, on_delete=models.CASCADE)
+    produk = models.ForeignKey(Produk, on_delete=models.CASCADE, null=True, blank=True)
     tipe_interaksi = models.CharField(max_length=50, choices=[('view', 'View Product Detail'), ('search', 'Search'), ('chat', 'WhatsApp Chat')])
     durasi = models.IntegerField(default=0, help_text="Lama melihat produk dalam detik")
     waktu_interaksi = models.DateTimeField(auto_now_add=True)
