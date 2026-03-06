@@ -102,7 +102,7 @@ WSGI_APPLICATION = 'Catalogue_PKN.wsgi.application'
 import os
 import dj_database_url
 
-# Ambil dari environment variable Railway
+# Ambil dari environment variable Railway 
 DATABASE_URL = os.getenv('DATABASE_URL')
 
 if DATABASE_URL:
@@ -125,7 +125,7 @@ else:
         }
     }
 
-
+# tes 123
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
