@@ -32,6 +32,10 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost,*').split(',')
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://django-backend-production-a01f.up.railway.app'
+]
+
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'duvmajcjo',
     'API_KEY': '579582195138437',
