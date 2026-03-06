@@ -20,6 +20,7 @@ from .rekomendasi_utils import text_to_vector, cosine_similarity as manual_cosin
 from django.db.models import Sum, Count
 from rest_framework_simplejwt.authentication import JWTAuthentication
 import numpy as np
+from django.db import connection
 
 # --- HELPER FUNCTIONS ---
 def calculate_content_similarity_with_score(target_product, candidate_queryset, weight=0.5):
@@ -122,18 +123,46 @@ class UserDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 # --- CATEGORY & MESSAGE VIEWS ---
-
 class KategoriViewSet(viewsets.ModelViewSet):
     queryset = Kategori.objects.all()
     serializer_class = KategoriSerializer
     permission_classes = [IsAdmin]
+
+    def perform_create(self, serializer):
+        # 1. Simpan data kategori baru (baik dari API atau Website)
+        instance = serializer.save()
+        
+        # 2. Reset Sequence PostgreSQL secara otomatis
+        # Ini mencegah tabrakan ID (duplicate key) di masa depan
+        with connection.cursor() as cursor:
+            table_name = "Catalogue_kategori" # Sesuaikan jika nama app kamu bukan 'Catalogue'
+            cursor.execute(f"""
+                SELECT setval(
+                    pg_get_serial_sequence('"{table_name}"', 'id'), 
+                    coalesce(max(id), 0) + 1, 
+                    false
+                ) FROM "{table_name}";
+            """)
 
 class PesanViewSet(viewsets.ModelViewSet):
     queryset = Pesan.objects.all()
     serializer_class = PesanSerializer
     permission_classes = [IsAdmin] 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        # 1. Simpan pesan dengan user yang sedang login
+        instance = serializer.save(user=self.request.user)
+        
+        # 2. Sinkronisasi Sequence ID
+        # Ini mencegah tabrakan ID jika sebelumnya ada data yang di-inject manual
+        with connection.cursor() as cursor:
+            table_name = "Catalogue_pesan" # Pastikan nama tabel di DB sesuai (App_Model)
+            cursor.execute(f"""
+                SELECT setval(
+                    pg_get_serial_sequence('"{table_name}"', 'id'), 
+                    coalesce(max(id), 0) + 1, 
+                    false
+                ) FROM "{table_name}";
+            """)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
@@ -162,17 +191,32 @@ def send_message(request):
 
 
 # --- PRODUCT CORE VIEWS ---
-
 class ProdukList(APIView):
     permission_classes = [IsAdmin]
+    
     def get(self, request):
         produk = Produk.objects.all()
         serializer = ProdukSerializer(produk, many=True)
         return Response(serializer.data)
+
     def post(self, request):
         serializer = ProdukSerializer(data=request.data)
         if serializer.is_valid():
+            # 1. Simpan produk baru
             serializer.save()
+            
+            # 2. Reset Sequence PostgreSQL secara otomatis
+            # Mencegah IntegrityError (duplicate key) pada ID
+            with connection.cursor() as cursor:
+                table_name = "Catalogue_produk" # Pastikan nama tabel benar
+                cursor.execute(f"""
+                    SELECT setval(
+                        pg_get_serial_sequence('"{table_name}"', 'id'), 
+                        coalesce(max(id), 0) + 1, 
+                        false
+                    ) FROM "{table_name}";
+                """)
+                
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

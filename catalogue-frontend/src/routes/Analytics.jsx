@@ -283,7 +283,10 @@ const Analytics = () => {
               title="Total Products"
               value={summary.total_products || 0}
             />
-            <StatCard title="Active Users" value={summary.active_users || 0} />
+            <StatCard
+              title="Active Users"
+              value={summary.total_active_users || 0}
+            />
           </div>
 
           {/* Section 3: Table */}
