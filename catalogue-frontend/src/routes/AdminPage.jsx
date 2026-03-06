@@ -23,6 +23,8 @@ function AdminPage() {
   const [EditedCategory, setEditedCategory] = useState(null);
   const [editedImage, setEditedImage] = useState(null);
   // Untuk menampung File dari input
+  const API_BASE =
+    "https://django-backend-production-a01f.up.railway.app/Catalogue_api";
 
   // INI YANG HILANG (Penyebab error editForm):
   const [editForm, setEditForm] = useState({
@@ -130,63 +132,51 @@ function AdminPage() {
   const handleUpdate = async (e) => {
     e.preventDefault();
 
+    const formData = new FormData();
+    // Ambil nilai langsung dari state yang ada di input modal kamu
+    formData.append("nama", editedName);
+    formData.append("harga", editedPrice);
+    formData.append("stok", editedStock);
+    formData.append("deskripsi", editedDesc);
+    formData.append("kategori", EditedCategory);
+
+    // LOGIKA GAMBAR:
+    // Jika user memilih file baru melalui input type="file"
+    if (editedImage instanceof File) {
+      formData.append("gambar", editedImage);
+    }
+
     try {
-      // 1. Tentukan URL Gambar Awal (dari state editForm)
-      let imageUrl = editForm.gambar;
-
-      // 2. Jika user memilih file baru (object File), upload ke ImgBB
-      if (editedImage && editedImage instanceof File) {
-        const imgData = new FormData();
-        imgData.append("image", editedImage);
-
-        const imgbbRes = await axios.post(
-          `https://api.imgbb.com/1/upload?key=a1650bd6a30b13f098d8eb7b933b9181`,
-          imgData,
-        );
-
-        imageUrl = imgbbRes.data.data.url;
-      }
-
-      // 3. Kirim Patch Request (Struktur sama dengan handleUpdateSubmit)
-      await axios.patch(
-        `https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/${editingId}/`,
-        {
-          nama: editForm.nama,
-          harga: editForm.harga,
-          stok: editForm.stok,
-          deskripsi: editForm.deskripsi,
-          kategori: editForm.kategori,
-          gambar: imageUrl, // Gunakan URL hasil upload atau URL lama
-        },
+      const response = await axios.patch(
+        `${API_BASE}/produk/${editingId}/`,
+        formData,
         {
           headers: {
             Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data", // Wajib ada
           },
         },
       );
 
-      // 4. Cleanup State (Sama dengan handleUpdateSubmit)
-      setEditingId(null);
-      setEditedImage(null); // Reset file picker
-
-      // Jika ini di halaman list produk:
-      if (typeof refreshProducts === "function") refreshProducts();
-
-      // Jika ini di halaman detail produk (update local state):
+      // Update state tampilan agar langsung berubah tanpa refresh
       if (typeof setProduct === "function") {
-        setProduct({
-          ...product,
-          ...editForm,
-          gambar: imageUrl,
-          harga: Number(editForm.harga),
-          stok: Number(editForm.stok),
-        });
+        setProduct(response.data);
       }
 
+      // Jika fungsi ini ada di halaman list produk:
+      if (typeof setProducts === "function") {
+        setProducts((prev) =>
+          prev.map((p) => (p.id === editingId ? response.data : p)),
+        );
+      }
+
+      // Tutup modal dan reset file picker
+      setEditingId(null);
+      setEditedImage(null);
       alert("Produk berhasil diperbarui!");
     } catch (err) {
-      console.error("Update failed", err.response?.data || err.message);
-      alert("Gagal memperbarui produk.");
+      console.error("Update failed:", err.response?.data);
+      alert("Gagal mengupdate produk. Periksa konsol browser.");
     }
   };
 
@@ -212,47 +202,53 @@ function AdminPage() {
   const handleAddProduct = async (e) => {
     e.preventDefault();
 
-    let imageUrl = "";
+    // 1. Gunakan FormData untuk mengirim file dan teks sekaligus
+    const formData = new FormData();
+    formData.append("nama", newName);
+    formData.append("harga", newPrice);
+    formData.append("stok", newStock);
+    formData.append("deskripsi", newDesc);
 
+    // Pastikan kategori mengirim ID (angka)
+    const kategoriId = newCategory?.id || newCategory;
+    formData.append("kategori", kategoriId);
+
+    // 2. Jika ada file gambar, masukkan langsung ke FormData
     if (newImage) {
-      const imgData = new FormData();
-      imgData.append("image", newImage);
-
-      const imgbbRes = await axios.post(
-        `https://api.imgbb.com/1/upload?key=a1650bd6a30b13f098d8eb7b933b9181`,
-        imgData,
-      );
-
-      imageUrl = imgbbRes.data.data.url;
+      formData.append("gambar", newImage);
     }
 
-    await axios.post(
-      "https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/",
-      {
-        nama: newName,
-        harga: newPrice,
-        stok: newStock,
-        kategori: newCategory,
-        deskripsi: newDesc,
-        gambar: imageUrl,
-      },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    try {
+      // 3. Kirim ke Django (Tanpa perlu upload ke ImgBB dulu)
+      await axios.post(
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "multipart/form-data", // Wajib untuk upload file
+          },
         },
-      },
-    );
+      );
 
-    setNewName("");
-    setNewPrice("");
-    setNewStock("");
-    setNewCategory("");
-    setNewDesc("");
-    setNewImage(null);
-    refreshProducts();
-    setActiveTab("products");
+      // 4. Reset State
+      setNewName("");
+      setNewPrice("");
+      setNewStock("");
+      setNewCategory("");
+      setNewDesc("");
+      setNewImage(null);
+
+      // Refresh list dan pindah tab
+      if (typeof refreshProducts === "function") refreshProducts();
+      setActiveTab("products");
+
+      alert("Produk berhasil ditambahkan!");
+    } catch (err) {
+      console.error("Add Product failed:", err.response?.data || err.message);
+      alert("Gagal menambah produk. Pastikan semua field terisi dengan benar.");
+    }
   };
-
   const handleAddCategory = (e) => {
     e.preventDefault();
     axios
@@ -580,11 +576,10 @@ function AdminPage() {
                       />
                     </div>
                     <input
-                      type="text"
-                      placeholder="Image URL (ImgBB direct link)"
-                      value={newImage}
-                      onChange={(e) => setNewImage(e.target.value)}
-                      className="w-full px-4 py-3 rounded-xl border border-slate-200"
+                      type="file"
+                      accept="image/*" // Membatasi hanya file gambar
+                      onChange={(e) => setNewImage(e.target.files[0])} // Mengambil file pertama
+                      className="w-full px-4 py-3 rounded-xl border border-slate-200 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-slate-50 file:text-slate-700 hover:file:bg-slate-100"
                     />
                     <select
                       value={newCategory}

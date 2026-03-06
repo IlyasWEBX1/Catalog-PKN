@@ -33,11 +33,10 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost,*').split(',')
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+    'CLOUD_NAME': 'duvmajcjo',
+    'API_KEY': '579582195138437',
+    'API_SECRET': 'Sv6gcoG_wHD1aLxS2rL2lJkD1gA', # Secret yang kamu temukan tadi
 }
-
 
 # Application definition
 
@@ -49,12 +48,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'cloudinary_storage',
     'django.contrib.staticfiles',
+     'cloudinary',
     'rest_framework',
     'rest_framework.authtoken',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
     'Catalogue',
-    'cloudinary',
 ]
 
 MIDDLEWARE = [

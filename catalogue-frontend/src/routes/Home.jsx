@@ -152,7 +152,7 @@ function Home() {
               >
                 <div className="h-80 overflow-hidden">
                   <img
-                    src={`https://django-backend-production-a01f.up.railway.app/${product.gambar}`}
+                    src={`${product.gambar}`}
                     alt={product.categoryName}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
@@ -206,7 +206,7 @@ function Home() {
                 <div className="bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-300 overflow-hidden mb-4">
                   <div className="h-64 overflow-hidden bg-gray-50">
                     <img
-                      src={`https://django-backend-production-a01f.up.railway.app/${product.gambar}`}
+                      src={`${product.gambar}`}
                       alt={product.nama}
                       className="w-full h-full object-cover hover:scale-105 transition-transform duration-500"
                     />
