@@ -2,7 +2,7 @@ from django.db.models import Sum, F
 from django.db.models.functions import TruncMonth, TruncDate
 from django.http import JsonResponse
 from rest_framework.response import Response
-from .models import Produk, TransactionDetail, Laporan
+from .models import Produk, TransactionDetail, Laporan, InteractionLog
 from rest_framework.decorators import api_view
 
 from datetime import datetime
@@ -111,7 +111,21 @@ def revenue_trend(request):
 
 def analytics_overview(request):
     filters = get_date_range(request)
+    
+    # Ambil rentang tanggal untuk filter InteractionLog & Laporan
+    start_date = request.GET.get("start", "1900-01-01")
+    end_date = request.GET.get("end", "2100-01-01")
 
+    # 1. Hitung User Aktif dari InteractionLog
+    total_active_users = (
+        InteractionLog.objects
+        .filter(waktu_interaksi__date__range=[start_date, end_date])
+        .values('user')
+        .distinct()
+        .count()
+    )
+
+    # 2. Revenue (Kode lama kamu)
     total_revenue = (
         TransactionDetail.objects
         .filter(**filters)
@@ -119,6 +133,7 @@ def analytics_overview(request):
         ["total"] or 0
     )
 
+    # 3. Statistik Produk (Kode lama kamu)
     produk_stats = (
         TransactionDetail.objects
         .filter(**filters)
@@ -134,12 +149,8 @@ def analytics_overview(request):
         "summary": {
             "total_revenue": float(total_revenue),
             "total_products": Produk.objects.count(),
-            "total_orders": Laporan.objects.filter(
-                tanggal__range=[
-                    request.GET.get("start", "1900-01-01"),
-                    request.GET.get("end", "2100-01-01")
-                ]
-            ).count(),
+            "total_orders": Laporan.objects.filter(tanggal__range=[start_date, end_date]).count(),
+            "total_active_users": total_active_users, # Tambahkan ini di JSON
         },
         "produk": list(produk_stats)
     })

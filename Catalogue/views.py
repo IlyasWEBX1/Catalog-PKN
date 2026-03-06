@@ -339,27 +339,24 @@ def interaction_log_create(request):
     except Exception as e: return Response({"error": str(e)}, status=400)
 
 # views.py
+from .models import Produk # Pastikan diimport
+
 @api_view(['POST'])
-@permission_classes([AllowAny]) # Sesuaikan dengan kebutuhan security Anda
+@permission_classes([AllowAny])
 def inject_laporan(request):
     try:
         data = request.data
-        # 1. Buat Header Laporan
-        laporan = Laporan.objects.create(
-            user_admin_id=data.get("user_admin_id"),
-            tanggal=data.get("tanggal"),
-            nama_pembeli=data.get("nama_pembeli", "Dummy Buyer"),
-            total_penjualan_keseluruhan=data.get("total_revenue", 0)
-        )
+        p_id = data.get("product_id")
         
-        # 2. Buat Detail Transaksi agar muncul di chart product-multiline
-        TransactionDetail.objects.create(
-            transaksi=laporan,
-            produk_id=data.get("product_id"),
-            jumlah_terjual=data.get("qty", 1),
-            harga_satuan=data.get("harga_satuan", 0),
-            total_penjualan_detail=data.get("total_revenue", 0)
-        )
+        # Validasi apakah produk ada di DB
+        if not Produk.objects.filter(id=p_id).exists():
+            return Response({"error": f"Produk ID {p_id} tidak ditemukan di database Railway!"}, status=400)
+
+        # 1. Buat Header Laporan
+        laporan = Laporan.objects.create(...)
+        
+        # 2. Buat Detail Transaksi
+        TransactionDetail.objects.create(...)
         
         return Response({"message": f"Injeksi Berhasil ID {laporan.id}"}, status=201)
     except Exception as e:
