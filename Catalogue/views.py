@@ -172,33 +172,32 @@ class PesanViewSet(viewsets.ModelViewSet):
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def send_message(request):
+    # Sesuaikan dengan apa yang dikirim oleh script (past_date dikirim sebagai "tanggal")
     product_id = request.data.get("product_id")
     message = request.data.get("message")
     user_id = request.data.get("user_id")
+    # TANGKAP key "tanggal" dari script kamu
     tanggal_custom = request.data.get("tanggal") 
 
     if not all([product_id, message]): 
         return Response({"error": "Missing fields"}, status=400)
 
     try:
-        # Gunakan filter().first() agar lebih aman atau sesuaikan logic user kamu
         user = User.objects.filter(id=user_id).first() if user_id else User.objects.filter(username="guest").first()
-    except Exception as e:
-        return Response({"error": str(e)}, status=404)
-
-    try:
-        # 1. Inisialisasi Objek
+        
+        # 1. Inisialisasi Objek (Pastikan field model adalah 'isi_pesan' dan 'produk_id')
         pesan = Pesan(user=user, produk_id=product_id, isi_pesan=message)
         
         # 2. Assign Tanggal Custom jika ada
         if tanggal_custom:
-            pesan.waktu_dikirim = tanggal_custom # Pastikan nama field di model Pesan benar
+            # Pastikan field di Model Pesan adalah 'waktu'
+            pesan.waktu = tanggal_custom 
         
         pesan.save()
 
-        # 3. MAGIC LOGIC: Reset Sequence PostgreSQL
+        # 3. Sinkronisasi Sequence ID (Sudah Benar)
         with connection.cursor() as cursor:
-            table_name = "Catalogue_pesan" # Sesuaikan NamaApp_NamaModel
+            table_name = "Catalogue_pesan"
             cursor.execute(f"""
                 SELECT setval(
                     pg_get_serial_sequence('"{table_name}"', 'id'), 
@@ -210,7 +209,7 @@ def send_message(request):
         return Response({
             "status": "Success",
             "message": f"Pesan created for product {product_id}",
-            "timestamp": pesan.waktu_dikirim
+            "timestamp": pesan.waktu  # Ubah dari waktu_dikirim ke waktu
         }, status=201)
 
     except Exception as e:
