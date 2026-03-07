@@ -20,7 +20,7 @@ from .rekomendasi_utils import text_to_vector, cosine_similarity as manual_cosin
 from django.db.models import Sum, Count
 from rest_framework_simplejwt.authentication import JWTAuthentication
 import numpy as np
-from django.db import connection
+from django.db import connection, transaction
 
 # --- HELPER FUNCTIONS ---
 def calculate_content_similarity_with_score(target_product, candidate_queryset, weight=0.5):
@@ -170,24 +170,46 @@ def send_message(request):
     product_id = request.data.get("product_id")
     message = request.data.get("message")
     user_id = request.data.get("user_id")
-    # TANGKAP TANGGAL DARI REQUEST
     tanggal_custom = request.data.get("tanggal") 
 
     if not all([product_id, message]): 
         return Response({"error": "Missing fields"}, status=400)
 
     try:
-        user = User.objects.get(id=user_id) if user_id else User.objects.get(username="guest")
-    except User.DoesNotExist:
-        return Response({"error": "User not found"}, status=404)
+        # Gunakan filter().first() agar lebih aman atau sesuaikan logic user kamu
+        user = User.objects.filter(id=user_id).first() if user_id else User.objects.filter(username="guest").first()
+    except Exception as e:
+        return Response({"error": str(e)}, status=404)
 
-    # BUAT PESAN DENGAN TANGGAL CUSTOM JIKA ADA
-    pesan = Pesan(user=user, produk_id=product_id, isi_pesan=message)
-    if tanggal_custom:
-        pesan.waktu = tanggal_custom # Pastikan nama field di model Pesan adalah 'waktu'
-    pesan.save()
+    try:
+        # 1. Inisialisasi Objek
+        pesan = Pesan(user=user, produk_id=product_id, isi_pesan=message)
+        
+        # 2. Assign Tanggal Custom jika ada
+        if tanggal_custom:
+            pesan.waktu_dikirim = tanggal_custom # Pastikan nama field di model Pesan benar
+        
+        pesan.save()
 
-    return Response({"message": f"Pesan created on {pesan.waktu}"})
+        # 3. MAGIC LOGIC: Reset Sequence PostgreSQL
+        with connection.cursor() as cursor:
+            table_name = "Catalogue_pesan" # Sesuaikan NamaApp_NamaModel
+            cursor.execute(f"""
+                SELECT setval(
+                    pg_get_serial_sequence('"{table_name}"', 'id'), 
+                    coalesce(max(id), 0) + 1, 
+                    false
+                ) FROM "{table_name}";
+            """)
+
+        return Response({
+            "status": "Success",
+            "message": f"Pesan created for product {product_id}",
+            "timestamp": pesan.waktu_dikirim
+        }, status=201)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
 
 
 # --- PRODUCT CORE VIEWS ---
@@ -224,16 +246,35 @@ class ProdukDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Produk.objects.all()
     serializer_class = ProdukSerializer
     permission_classes = [AllowAny]
+
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
+        
         try:
+            # 1. Catat Log Interaksi
             InteractionLog.objects.create(
                 user=request.user if request.user.is_authenticated else None,
-                produk=instance, tipe_interaksi='view'
+                produk=instance, 
+                tipe_interaksi='view'
             )
+            
+            # 2. Reset Sequence InteractionLog secara otomatis
+            # Ini memastikan pencatatan log berikutnya tidak pernah Error 500
+            with connection.cursor() as cursor:
+                table_name = "Catalogue_interactionlog" # Pastikan nama tabel benar
+                cursor.execute(f"""
+                    SELECT setval(
+                        pg_get_serial_sequence('"{table_name}"', 'id'), 
+                        coalesce(max(id), 0) + 1, 
+                        false
+                    ) FROM "{table_name}";
+                """)
+                
         except Exception as e:
-            print(f"Log Error (Ignored): {e}")
+            # Tetap gunakan print/logger agar kita tahu jika ada masalah lain
+            print(f"Log Error: {e}")
+            
         return Response(serializer.data)
 
 
@@ -334,22 +375,59 @@ class ProdukStudioViewSet(viewsets.ModelViewSet):
     def performance(self, request, pk=None):
         try:
             produk = self.get_object()
+            
+            # 1. Total Views (Tetap sama)
             views = InteractionLog.objects.filter(produk=produk, tipe_interaksi='view').count()
-            inquiries = Pesan.objects.filter(produk=produk).count()
-            conv_rate = f"{(inquiries/views*100):.1f}%" if views > 0 else "0%"
-            monthly_sales = TransactionDetail.objects.filter(produk=produk).annotate(month=TruncMonth('transaksi__tanggal'))\
-                            .values('month').annotate(revenue=Sum('total_penjualan_detail'), qty=Sum('jumlah_terjual')).order_by('month')
-            chart_data = [{"month": i['month'].strftime('%b %Y'), "revenue": float(i['revenue'] or 0), "qty": i['qty'] or 0} for i in monthly_sales]
+            
+            # 2. Update Logika Inquiries
+            # Kita hitung semua pesan yang masuk (Engagement)
+            total_inquiries = Pesan.objects.filter(produk=produk).count()
+            
+            # Kita hitung pesan yang sampai tahap 'confirmed' (Penjualan Sukses via Pesan)
+            confirmed_inquiries = Pesan.objects.filter(produk=produk, status='confirmed').count()
+            
+            # 3. Update Conversion Rate
+            # Sekarang jauh lebih akurat: Seberapa banyak view yang jadi konfirmasi?
+            conv_rate = f"{(confirmed_inquiries / views * 100):.1f}%" if views > 0 else "0%"
+            
+            # --- Bagian Sales & Chart tetap dipertahankan ---
+            monthly_sales = TransactionDetail.objects.filter(produk=produk).annotate(
+                month=TruncMonth('transaksi__tanggal')
+            ).values('month').annotate(
+                revenue=Sum('total_penjualan_detail'), 
+                qty=Sum('jumlah_terjual')
+            ).order_by('month')
+            
+            chart_data = [
+                {
+                    "month": i['month'].strftime('%b %Y'), 
+                    "revenue": float(i['revenue'] or 0), 
+                    "qty": i['qty'] or 0
+                } for i in monthly_sales
+            ]
+            
             total_rev = sum(i['revenue'] for i in chart_data)
             total_qty = sum(i['qty'] for i in chart_data)
+
             return Response({
-                "product_name": produk.nama, "current_stock": produk.stok,
+                "product_name": produk.nama,
+                "current_stock": produk.stok,
                 "total_stock_value": float(produk.harga * produk.stok),
-                "sales_performance": {"total_revenue": total_rev, "quantity_sold": total_qty, "average_price_point": float(total_rev/total_qty) if total_qty > 0 else 0},
-                "engagement": {"views": views, "inquiries": inquiries, "conversion_rate": conv_rate},
+                "sales_performance": {
+                    "total_revenue": total_rev,
+                    "quantity_sold": total_qty,
+                    "average_price_point": float(total_rev/total_qty) if total_qty > 0 else 0
+                },
+                "engagement": {
+                    "views": views,
+                    "total_inquiries": total_inquiries, # Mengganti inquiries lama
+                    "confirmed_inquiries": confirmed_inquiries, # Menambah metrik baru
+                    "conversion_rate": conv_rate
+                },
                 "chart_data": chart_data
             })
-        except Exception as e: return Response({"error": str(e)}, status=500)
+        except Exception as e:
+            return Response({"error": str(e)}, status=500)
 
 
 # --- TRANSACTION & LOGGING ---
@@ -366,7 +444,8 @@ def konfirmasi_pesanan(request, produk_id, pesan_id):
         laporan.save()
         produk.stok -= jumlah
         produk.save()
-        pesan.delete()
+        pesan.status = 'confirmed'
+        pesan.save()
         print(pesan.waktu, produk.nama, jumlah, request.user.username if request.user.is_authenticated else "Guest")
         return Response({'message': 'Pesanan berhasil dikonfirmasi'}, status=201)
     except Exception as e: return Response({'error': str(e)}, status=404)
@@ -375,13 +454,40 @@ def konfirmasi_pesanan(request, produk_id, pesan_id):
 @permission_classes([AllowAny])
 def interaction_log_create(request):
     try:
-        InteractionLog.objects.create(
-            user_id=request.data.get('user'), produk_id=request.data.get('produk'),
-            tipe_interaksi=request.data.get('tipe_interaksi', 'view'), durasi=request.data.get('durasi', 0)
-        )
-        return Response({"status": "Created"}, status=201)
-    except Exception as e: return Response({"error": str(e)}, status=400)
+        # 1. Ambil data dari request
+        u_id = request.data.get('user')
+        p_id = request.data.get('produk')
+        tipe = request.data.get('tipe_interaksi', 'view')
+        durasi = request.data.get('durasi', 0)
 
+        # 2. Validasi minimal: Cek apakah produk ada
+        if not Produk.objects.filter(id=p_id).exists():
+            return Response({"error": f"Produk ID {p_id} tidak ditemukan"}, status=400)
+
+        # 3. Simpan Log
+        InteractionLog.objects.create(
+            user_id=u_id, 
+            produk_id=p_id,
+            tipe_interaksi=tipe, 
+            durasi=durasi
+        )
+
+        # 4. SELF-HEALING: Reset Sequence ID PostgreSQL
+        # Ini mencegah error 'Key (id)=(X) already exists' di masa depan
+        with connection.cursor() as cursor:
+            table_name = "Catalogue_interactionlog" # Pastikan nama tabel benar
+            cursor.execute(f"""
+                SELECT setval(
+                    pg_get_serial_sequence('"{table_name}"', 'id'), 
+                    coalesce(max(id), 0) + 1, 
+                    false
+                ) FROM "{table_name}";
+            """)
+
+        return Response({"status": "Created & Sequence Synchronized"}, status=201)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=400)
 # views.py
 from .models import Produk # Pastikan diimport
 
@@ -392,16 +498,42 @@ def inject_laporan(request):
         data = request.data
         p_id = data.get("product_id")
         
-        # Validasi apakah produk ada di DB
+        # 1. Validasi Produk
         if not Produk.objects.filter(id=p_id).exists():
-            return Response({"error": f"Produk ID {p_id} tidak ditemukan di database Railway!"}, status=400)
+            return Response({"error": f"Produk ID {p_id} tidak ditemukan!"}, status=400)
 
-        # 1. Buat Header Laporan
-        laporan = Laporan.objects.create(...)
+        # Gunakan transaction.atomic agar jika satu gagal, semua dibatalkan (Data Integrity)
+        with transaction.atomic():
+            # 2. Buat Header Laporan
+            laporan = Laporan.objects.create(
+                user_admin_id=data.get("user_admin_id"),
+                tanggal=data.get("tanggal"),
+                nama_pembeli=data.get("nama_pembeli", "Dummy Buyer"),
+                total_penjualan_keseluruhan=data.get("total_revenue", 0)
+            )
+            
+            # 3. Buat Detail Transaksi (Ini yang dibaca oleh Dashboard Performance)
+            TransactionDetail.objects.create(
+                transaksi=laporan,
+                produk_id=p_id,
+                jumlah_terjual=data.get("qty", 1),
+                harga_satuan=data.get("harga_satuan", 0),
+                total_penjualan_detail=data.get("total_revenue", 0)
+            )
+
+            # 4. SELF-HEALING: Reset Sequence PostgreSQL
+            # Melindungi tabel Laporan dan TransactionDetail dari IntegrityError
+            with connection.cursor() as cursor:
+                for table in ["Catalogue_laporan", "Catalogue_transactiondetail"]:
+                    cursor.execute(f"""
+                        SELECT setval(
+                            pg_get_serial_sequence('"{table}"', 'id'), 
+                            coalesce(max(id), 0) + 1, 
+                            false
+                        ) FROM "{table}";
+                    """)
         
-        # 2. Buat Detail Transaksi
-        TransactionDetail.objects.create(...)
-        
-        return Response({"message": f"Injeksi Berhasil ID {laporan.id}"}, status=201)
+        return Response({"message": f"Injeksi Berhasil ID {laporan.id} & Database Sinkron"}, status=201)
+
     except Exception as e:
         return Response({"error": str(e)}, status=400)

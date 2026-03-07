@@ -109,6 +109,7 @@ const Analytics = () => {
   const [grossingProducts, setGrossingProducts] = useState(null);
   const [activeChart, setActiveChart] = useState("revenue");
   const [dateRange, setDateRange] = useState({ start: "", end: "" });
+  const [selectedDate, setSelectedDate] = useState(null);
 
   useEffect(() => {
     const now = new Date();
@@ -194,58 +195,45 @@ const Analytics = () => {
     () => formatMultiLineData(multiLineData),
     [multiLineData],
   );
+  const handleDateChangeFromChart = (newDate) => {
+    if (!newDate) return;
+
+    // newDate biasanya berbentuk "YYYY-MM-DD" dari chartData
+    setDateRange((prevRange) => ({
+      start: newDate,
+      end: prevRange.end > newDate ? prevRange.end : newDate, // Pastikan end tidak mundur jika user klik tanggal sebelumnya
+    }));
+
+    // Simpan juga di selectedDate jika ingin memberi highlight di UI
+    setSelectedDate(newDate);
+  };
   const productGrowthMetrics = useMemo(() => {
     if (!chartData || chartData.length < 2) return {};
 
-    // Ambil tanggal pertama dan terakhir
-    const firstDate = new Date(chartData[0].tanggal);
-    const lastDate = new Date(chartData[chartData.length - 1].tanggal);
-
-    // Tentukan titik tengah berdasarkan waktu
-    const midTime = (firstDate.getTime() + lastDate.getTime()) / 2;
-    const midDate = new Date(midTime);
-
-    // Bagi berdasarkan tanggal, bukan index
-    const firstPeriod = chartData.filter(
-      (item) => new Date(item.tanggal) <= midDate,
-    );
-
-    const secondPeriod = chartData.filter(
-      (item) => new Date(item.tanggal) > midDate,
-    );
-
     const metrics = {};
 
-    const sum = (arr, key) =>
-      arr.reduce((acc, item) => acc + (item[key] ?? 0), 0);
-
-    const calculateGrowth = (startTotal, endTotal) => {
-      if (startTotal === 0 && endTotal === 0) return 0;
-      if (startTotal === 0 && endTotal > 0) return null; // Undefined
-      return ((endTotal - startTotal) / startTotal) * 100;
+    const calculateGrowth = (start, end) => {
+      if (start === 0) {
+        if (end > 0) return 100;
+        return 0;
+      }
+      return ((end - start) / start) * 100;
     };
 
     productKeys.forEach((key) => {
       const revKey = `${key}_revenue`;
-      const qtyKey1 = `${key}_sales`;
-      const qtyKey2 = `${key}_qty`;
 
-      const firstRevTotal = sum(firstPeriod, revKey);
-      const secondRevTotal = sum(secondPeriod, revKey);
+      const getQty = (item) => item[`${key}_sales`] ?? item[`${key}_qty`] ?? 0;
 
-      const firstQtyTotal = firstPeriod.reduce(
-        (acc, item) => acc + (item[qtyKey1] ?? item[qtyKey2] ?? 0),
-        0,
-      );
+      const startRevenue = chartData[0]?.[revKey] ?? 0;
+      const endRevenue = chartData[chartData.length - 1]?.[revKey] ?? 0;
 
-      const secondQtyTotal = secondPeriod.reduce(
-        (acc, item) => acc + (item[qtyKey1] ?? item[qtyKey2] ?? 0),
-        0,
-      );
+      const startQty = getQty(chartData[0]);
+      const endQty = getQty(chartData[chartData.length - 1]);
 
       metrics[key] = {
-        revGrowth: calculateGrowth(firstRevTotal, secondRevTotal),
-        qtyGrowth: calculateGrowth(firstQtyTotal, secondQtyTotal),
+        revGrowth: calculateGrowth(startRevenue, endRevenue),
+        qtyGrowth: calculateGrowth(startQty, endQty),
       };
     });
 
@@ -376,10 +364,16 @@ const Analytics = () => {
               {/* Inner Chart Area: Ensure this has enough height to show the X-axis labels */}
               <div className="relative w-full min-h-[400px] h-[600px]">
                 {activeChart === "product" && (
-                  <ProductMultiLineChart data={chartData} />
+                  <ProductMultiLineChart
+                    data={chartData}
+                    onDateSelect={handleDateChangeFromChart}
+                  />
                 )}
                 {activeChart === "quantity" && (
-                  <ProductQuantityChart data={chartData} />
+                  <ProductQuantityChart
+                    data={chartData}
+                    onDateSelect={handleDateChangeFromChart}
+                  />
                 )}
                 {activeChart === "revenue" && (
                   <ProductRevenueChart data={productData} />
@@ -401,7 +395,7 @@ const Analytics = () => {
                   <div key={idx}>
                     <div className="flex justify-between text-sm mb-2">
                       <span className="text-gray-600">
-                        {item.kategori_terlaris}
+                        {item.kategori_nama}
                       </span>
                       <span className="font-bold text-gray-800">
                         {item.total_terjual}

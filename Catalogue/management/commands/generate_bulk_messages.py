@@ -1,98 +1,67 @@
 import requests
 import random
+import time
 from datetime import datetime, timedelta
 
+# Gunakan session agar koneksi lebih stabil
+session = requests.Session()
 API_BASE = "https://django-backend-production-a01f.up.railway.app/Catalogue_api"
 
-def get_dynamic_data(current_date):
-    """
-    Simulates business logic: 
-    - Weekend sales are higher.
-    - Sales grow slightly every year.
-    """
-    base_qty = random.randint(1, 3)
-    
-    # Weekend boost (Friday-Sunday)
-    if current_date.weekday() >= 4:
-        base_qty += random.randint(2, 5)
-        
-    # Yearly growth (2021 is slower than 2024)
-    growth_boost = (current_date.year - 2021) * 1 
-    
-    return base_qty + growth_boost
+def inject_10_messages(target_product_id):
+    # 1. Ambil info produk untuk subjek pesan agar realistis
+    print(f"🔍 Mengecek produk ID {target_product_id}...")
+    try:
+        # Kita asumsikan endpoint ini sudah ada dari diskusi sebelumnya
+        r_prod = session.get(f"{API_BASE}/produk/{target_product_id}/", timeout=10)
+        product_name = r_prod.json().get('nama', 'Produk') if r_prod.status_code == 200 else "Produk"
+    except:
+        product_name = "Produk"
 
-def inject_clean_history():
-    product_list = [
-        {
-        "id": 3,
-        "nama": "Maroon Series - Panci",
-        "harga": 790000.00,
-    },
-    {
-        "id": 5,
-        "nama": "Pan Cake",
-        "harga": 350000.00,
-
-    },
-    {
-        "id": 6,
-        "nama": "Panci CKA Pot",
-        "harga": 450000.00,
-    },
-    {
-        "id": 7,
-        "nama": "Panci Grill Work",
-        "harga": 600000.00,
-    },
-    {
-        "id": 8,
-        "nama": "Wajan Anti Lengket Premium",
-        "harga": 250000.00,
-    },
-    {
-        "id": 9,
-        "nama": "Panci Stainless 3 Liter",
-        "harga": 180000.00,
-    },
-    {
-        "id": 10,
-        "nama": "Sepatula Kayu Premium",
-        "harga": 100000.00,
-    }
+    # 2. Template pesan simulasi
+    templates = [
+        "Apakah stok masih ada?",
+        "Bisa kirim pakai Grab/Gojek hari ini?",
+        "Ada promo untuk pembelian grosir?",
+        "Barangnya original kak?",
+        "Warnanya ready apa saja ya?",
+        "Bisa minta realpict-nya?",
+        "Pengiriman dari mana?",
+        "Ada garansi toko tidak?",
+        "Kira-kira sampai berapa hari ya?",
+        "Bahannya terbuat dari apa?"
     ]
-    
-    start_date = datetime(2025, 1, 1)
-    end_date = datetime.now()
-    current_date = start_date
 
-    print("🚀 Starting Professional Data Injection...")
+    print(f"🚀 Memulai injeksi 10 pesan untuk: {product_name}...")
 
-    while current_date <= end_date:
-        # We don't sell every single day, let's say 40% chance of a sale
-        if random.random() < 0.4:
-            produk = random.choice(product_list)
-            qty = get_dynamic_data(current_date)
-            total_rev = produk['harga'] * qty
-
-            payload = {
-                "user_admin_id": 1,
-                "tanggal": current_date.strftime('%Y-%m-%d'),
-                "nama_pembeli": f"Customer_{current_date.strftime('%y%m%d')}",
-                "product_id": produk['id'],
-                "qty": qty,
-                "harga_satuan": produk['harga'],
-                "total_revenue": total_rev
-            }
-
-            try:
-                r = requests.post(f"{API_BASE}/inject-laporan/", json=payload)
-                if r.status_code == 201:
-                    print(f"✅ {current_date.date()} | {produk['nama']} | Qty: {qty}")
-            except Exception as e:
-                print(f"❌ Error at {current_date}: {e}")
+    # 3. Loop untuk 10 pesan
+    for i in range(7):
+        # Buat tanggal mundur (Pesan 1 hari ini, Pesan 2 kemarin, dst)
+        past_date = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d %H:%M:%S')
         
-        # Move to next day
-        current_date += timedelta(days=random.randint(1, 3))
+        payload = {
+            "product_id": target_product_id,
+            "message": templates[i],
+            "user_id": 1,         # Sesuaikan dengan ID Admin/User kamu
+            "tanggal": past_date  # Dikirim ke endpoint send-message kamu
+        }
+
+        try:
+            # Gunakan endpoint send-message yang baru kita bahas
+            response = session.post(f"{API_BASE}/send-message/", json=payload, timeout=10)
+            
+            if response.status_code == 201 or response.status_code == 200:
+                print(f"✅ [{i+1}/10] Berhasil: '{templates[i][:20]}...' pada {past_date}")
+            else:
+                print(f"❌ [{i+1}/10] Gagal: {response.status_code} - {response.text}")
+            
+            # Beri jeda sedikit agar server tidak kaget
+            time.sleep(0.5)
+
+        except Exception as e:
+            print(f"⚠️ Error pada index {i}: {e}")
+
+    print("\n✨ Injeksi 10 pesan selesai! Silakan cek Dashboard Performance.")
 
 if __name__ == "__main__":
-    inject_clean_history()
+    # Ganti angka 3 dengan ID produk yang ingin kamu isi pesannya
+    inject_10_messages(target_product_id=5)

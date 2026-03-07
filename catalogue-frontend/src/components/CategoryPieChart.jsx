@@ -11,7 +11,7 @@ const CategoryPieChart = ({ data = [] }) => {
 
   const chartData = {
     // Sesuai JSON: kategori_terlaris
-    labels: data.map((item) => item.kategori_terlaris),
+    labels: data.map((item) => item.kategori_nama),
     datasets: [
       {
         label: "Total Unit Terjual",

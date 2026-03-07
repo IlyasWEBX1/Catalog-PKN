@@ -7,16 +7,33 @@ import {
   YAxis,
   Tooltip,
   Legend,
-  CartesianGrid
+  CartesianGrid,
 } from "recharts";
 
 const COLOR_PALETTE = [
-  "#3b82f6", "#ef4444", "#10b981", "#f59e0b",
-  "#6366f1", "#ec4899", "#8b5cf6", "#14b8a6",
+  "#3b82f6",
+  "#ef4444",
+  "#10b981",
+  "#f59e0b",
+  "#6366f1",
+  "#ec4899",
+  "#8b5cf6",
+  "#14b8a6",
 ];
 
-const ProductQuantityChart = ({ data }) => {
+const ProductQuantityChart = ({ data, onDateSelect }) => {
   const [hiddenKeys, setHiddenKeys] = useState([]);
+
+  const handleChartClick = (state) => {
+    // Memastikan klik terjadi pada area yang memiliki data
+    if (state && state.activeLabel) {
+      const clickedDate = state.activeLabel; // Mengambil 'tanggal' dari titik yang diklik
+      if (onDateSelect) {
+        onDateSelect(clickedDate);
+        console.log(state.activeLabel.tanggal);
+      }
+    }
+  };
 
   if (!data || data.length === 0) {
     return (
@@ -27,14 +44,16 @@ const ProductQuantityChart = ({ data }) => {
   }
 
   // Mengambil key yang berakhiran _sales (seperti "Pan Cake_sales")
-  const productKeys = Object.keys(data[0]).filter((key) => 
-    key.endsWith("_sales")
+  const productKeys = Object.keys(data[0]).filter((key) =>
+    key.endsWith("_sales"),
   );
 
   const handleLegendClick = (e) => {
     const { dataKey } = e;
-    setHiddenKeys(prev => 
-      prev.includes(dataKey) ? prev.filter(k => k !== dataKey) : [...prev, dataKey]
+    setHiddenKeys((prev) =>
+      prev.includes(dataKey)
+        ? prev.filter((k) => k !== dataKey)
+        : [...prev, dataKey],
     );
   };
 
@@ -43,31 +62,45 @@ const ProductQuantityChart = ({ data }) => {
       <LineChart
         data={data}
         margin={{ top: 20, right: 30, left: 10, bottom: 40 }}
+        onClick={handleChartClick}
       >
-        <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
-        
-        <XAxis 
-          dataKey="tanggal" 
-          tick={{ fontSize: 12 }} 
-          dy={10} 
+        <CartesianGrid
+          strokeDasharray="3 3"
+          vertical={false}
+          stroke="#f0f0f0"
         />
-        
-        <YAxis 
-          tick={{ fontSize: 12 }} 
+
+        <XAxis dataKey="tanggal" tick={{ fontSize: 12 }} dy={10} />
+
+        <YAxis
+          tick={{ fontSize: 12 }}
           allowDecimals={false} // Menghindari angka desimal pada jumlah barang
-          label={{ value: 'Unit', angle: -90, position: 'insideLeft', fontSize: 12 }}
+          label={{
+            value: "Unit",
+            angle: -90,
+            position: "insideLeft",
+            fontSize: 12,
+          }}
         />
-        
-        <Tooltip 
-          contentStyle={{ borderRadius: '10px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
+
+        <Tooltip
+          contentStyle={{
+            borderRadius: "10px",
+            border: "none",
+            boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+          }}
           formatter={(value, name) => [`${value} Unit`, name]}
         />
-        
-        <Legend 
-          verticalAlign="top" 
-          height={40} 
+
+        <Legend
+          verticalAlign="top"
+          height={40}
           onClick={handleLegendClick}
-          wrapperStyle={{ cursor: 'pointer', userSelect: 'none', paddingBottom: '20px' }}
+          wrapperStyle={{
+            cursor: "pointer",
+            userSelect: "none",
+            paddingBottom: "20px",
+          }}
         />
 
         {/* Garis Total Kuantitas (dari "total_qty") */}
@@ -94,6 +127,11 @@ const ProductQuantityChart = ({ data }) => {
             name={key.replace("_sales", "").replace("_", " ")}
             stroke={COLOR_PALETTE[index % COLOR_PALETTE.length]}
             hide={hiddenKeys.includes(key)}
+            activeDot={{
+              r: 8,
+              onClick: (e, payload) =>
+                handleChartClick({ activeLabel: payload.payload.tanggal }),
+            }}
           />
         ))}
       </LineChart>
