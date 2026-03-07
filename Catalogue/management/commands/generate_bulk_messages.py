@@ -34,7 +34,7 @@ def inject_10_messages(target_product_id):
     print(f"🚀 Memulai injeksi 10 pesan untuk: {product_name}...")
 
     # 3. Loop untuk 10 pesan
-    for i in range(7):
+    for i in range(2):
         # Buat tanggal mundur (Pesan 1 hari ini, Pesan 2 kemarin, dst)
         past_date = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d %H:%M:%S')
         

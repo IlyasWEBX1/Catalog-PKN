@@ -16,6 +16,7 @@ class KategoriSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class PesanSerializer(serializers.ModelSerializer):
+    waktu = serializers.DateTimeField(required=False)
     class Meta:
         model = Pesan
         fields = '__all__'
