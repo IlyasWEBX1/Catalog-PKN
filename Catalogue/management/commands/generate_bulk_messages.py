@@ -36,7 +36,7 @@ def inject_10_messages(target_product_id):
     # 3. Loop untuk 10 pesan
     for i in range(7):
         # Buat tanggal mundur (Pesan 1 hari ini, Pesan 2 kemarin, dst)
-        past_date = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d %H:%M:%S')
+        past_date = (datetime.now() - timedelta(days=365)).strftime('%Y-%m-%d %H:%M:%S')
         
         payload = {
             "product_id": target_product_id,
@@ -64,4 +64,4 @@ def inject_10_messages(target_product_id):
 
 if __name__ == "__main__":
     # Ganti angka 3 dengan ID produk yang ingin kamu isi pesannya
-    inject_10_messages(target_product_id=5)
+    inject_10_messages(target_product_id=11)

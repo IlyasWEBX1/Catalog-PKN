@@ -48,6 +48,7 @@ function AdminPage() {
   const [newCategory, setNewCategory] = useState("");
   const [newDesc, setNewDesc] = useState("");
   const [newImage, setNewImage] = useState(null);
+  const [messageFilter, setMessageFilter] = useState("all"); // Default menampilkan semua
 
   // --- ORIGINAL LOGIC (All Preserved) ---
   const refreshProducts = () => {
@@ -89,6 +90,11 @@ function AdminPage() {
       .then(() => refreshProducts())
       .catch((err) => console.error("Delete error:", err));
   };
+
+  const displayMessages = messages.filter((msg) => {
+    if (messageFilter === "all") return true;
+    return msg.status === messageFilter;
+  });
 
   const handleDeleteCategory = (id) => {
     axios
@@ -280,6 +286,8 @@ function AdminPage() {
       });
   };
 
+  const pendingMessages = messages.filter((msg) => msg.status === "pending");
+
   const navigate = useNavigate();
 
   return (
@@ -436,9 +444,29 @@ function AdminPage() {
             {/* 3. MESSAGES TAB */}
             {activeTab === "messages" && (
               <div className="p-6 animate-in fade-in duration-500">
-                <h2 className="text-2xl font-bold text-slate-800 mb-6">
-                  Customer Messages
-                </h2>
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-slate-800">
+                    Customer Messages
+                  </h2>
+
+                  {/* Tombol Filter Kecil */}
+                  <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+                    {["all", "pending", "confirmed"].map((status) => (
+                      <button
+                        key={status}
+                        onClick={() => setMessageFilter(status)}
+                        className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all capitalize ${
+                          messageFilter === status
+                            ? "bg-white text-slate-800 shadow-sm"
+                            : "text-slate-500 hover:text-slate-700"
+                        }`}
+                      >
+                        {status}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
                 <div className="overflow-x-auto border border-slate-100 rounded-2xl">
                   <table className="w-full text-left border-collapse">
                     <thead className="bg-slate-800 text-white">
@@ -461,9 +489,10 @@ function AdminPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-100">
-                      {messages.map((pesan, index) => (
+                      {/* GUNAKAN displayMessages di sini, bukan pendingMessages lagi */}
+                      {displayMessages.map((pesan, index) => (
                         <tr
-                          key={index}
+                          key={pesan.id}
                           className="hover:bg-slate-50 transition-colors"
                         >
                           <td className="px-6 py-4 text-sm font-mono">
@@ -478,22 +507,32 @@ function AdminPage() {
                               ?.nama || "Unknown"}
                           </td>
                           <td className="px-6 py-4">
-                            <p className="text-sm font-bold text-slate-700">
-                              {pesan.laporan}
-                            </p>
+                            {/* Badge Status untuk membantu navigasi visual */}
+                            <span
+                              className={`text-[10px] uppercase px-2 py-0.5 rounded-full font-extrabold mb-1 inline-block ${
+                                pesan.status === "confirmed"
+                                  ? "bg-emerald-100 text-emerald-600"
+                                  : "bg-amber-100 text-amber-600"
+                              }`}
+                            >
+                              {pesan.status}
+                            </span>
                             <p className="text-xs text-slate-500">
                               {pesan.isi_pesan}
                             </p>
                           </td>
-                          <td className="px-6 py-4 text-right flex justify-end gap-2 mt-4">
-                            <button
-                              onClick={() =>
-                                handleConfirm(pesan.produk, pesan.id)
-                              }
-                              className="bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg shadow-emerald-200"
-                            >
-                              Confirm
-                            </button>
+                          <td className="px-6 py-4 text-right flex justify-end gap-2">
+                            {/* Sembunyikan tombol Confirm jika status sudah confirmed */}
+                            {pesan.status === "pending" && (
+                              <button
+                                onClick={() =>
+                                  handleConfirm(pesan.produk, pesan.id)
+                                }
+                                className="bg-emerald-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg shadow-emerald-200"
+                              >
+                                Confirm
+                              </button>
+                            )}
                             <button
                               onClick={() => handleDeletePesan(pesan.id)}
                               className="bg-red-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold shadow-lg shadow-red-200"

@@ -149,13 +149,18 @@ class PesanViewSet(viewsets.ModelViewSet):
     serializer_class = PesanSerializer
     permission_classes = [IsAdmin] 
     def perform_create(self, serializer):
-        # 1. Simpan pesan dengan user yang sedang login
-        instance = serializer.save(user=self.request.user)
+    # Ambil data waktu dari request jika ada (untuk keperluan testing/injeksi)
+    # Jika tidak ada, biarkan model menggunakan default=timezone.now
+        waktu_input = self.request.data.get('waktu')
         
-        # 2. Sinkronisasi Sequence ID
-        # Ini mencegah tabrakan ID jika sebelumnya ada data yang di-inject manual
+        if waktu_input:
+            instance = serializer.save(user=self.request.user, waktu=waktu_input)
+        else:
+            instance = serializer.save(user=self.request.user)
+
+        # 2. Sinkronisasi Sequence ID (Tetap dipertahankan)
         with connection.cursor() as cursor:
-            table_name = "Catalogue_pesan" # Pastikan nama tabel di DB sesuai (App_Model)
+            table_name = "Catalogue_pesan"
             cursor.execute(f"""
                 SELECT setval(
                     pg_get_serial_sequence('"{table_name}"', 'id'), 
