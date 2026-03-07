@@ -159,7 +159,7 @@ const ProductConfiguration = () => {
                 icon={<FiMessageCircle />}
                 color="emerald"
                 label="Interest"
-                value={performance?.engagement?.inquiries}
+                value={performance?.engagement?.confirmed_inquiries}
                 suffix="Chats"
               />
               <StatCard
