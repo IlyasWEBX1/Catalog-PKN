@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 
 # Gunakan session agar koneksi lebih stabil
 session = requests.Session()
-API_BASE = "https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev/Catalogue_api"
+API_BASE = "https://django-backend-production-a01f.up.railway.app/Catalogue_api"
 
 def inject_10_messages(target_product_id):
     # 1. Ambil info produk untuk subjek pesan agar realistis

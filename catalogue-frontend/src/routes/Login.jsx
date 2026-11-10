@@ -1,4 +1,3 @@
-import { API_BASE_URL } from "../config";
 import React, { useState } from "react";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
@@ -18,7 +17,7 @@ function LoginPage() {
 
     try {
       const res = await axios.post(
-        `${API_BASE_URL}/Catalogue_api/token/`,
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/token/",
         { username, password },
       );
       const token = res.data.access;

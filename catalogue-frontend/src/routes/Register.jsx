@@ -1,4 +1,3 @@
-import { API_BASE_URL } from "../config";
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
@@ -26,7 +25,7 @@ function RegisterPage() {
     e.preventDefault();
     try {
       await axios.post(
-        `${API_BASE_URL}/Catalogue_api/register/`,
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/register/",
         formData,
       );
       alert("Pendaftaran Berhasil! Silakan Login.");

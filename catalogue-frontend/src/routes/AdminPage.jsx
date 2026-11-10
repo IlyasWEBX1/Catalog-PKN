@@ -1,4 +1,3 @@
-import { API_BASE_URL } from "../config";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import AdminDashboard from "../components/AdminMenu";
@@ -25,7 +24,7 @@ function AdminPage() {
   const [editedImage, setEditedImage] = useState(null);
   // Untuk menampung File dari input
   const API_BASE =
-    `${API_BASE_URL}/Catalogue_api`;
+    "https://django-backend-production-a01f.up.railway.app/Catalogue_api";
 
   // INI YANG HILANG (Penyebab error editForm):
   const [editForm, setEditForm] = useState({
@@ -55,16 +54,16 @@ function AdminPage() {
   const refreshProducts = () => {
     Promise.all([
       axios.get(
-        `${API_BASE_URL}/Catalogue_api/produk/`,
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/",
       ),
       axios.get(
-        `${API_BASE_URL}/Catalogue_api/kategori/`,
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/kategori/",
       ),
       axios.get(
-        `${API_BASE_URL}/Catalogue_api/pesan/`,
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/pesan/",
       ),
       axios.get(
-        `${API_BASE_URL}/Catalogue_api/user/`,
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/user/",
       ),
     ])
       .then(([res, res2, res3, res4]) => {
@@ -83,7 +82,7 @@ function AdminPage() {
   const handleDelete = (id) => {
     axios
       .delete(
-        `${API_BASE_URL}/Catalogue_api/produk/${id}/`,
+        `https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/${id}/`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -100,7 +99,7 @@ function AdminPage() {
   const handleDeleteCategory = (id) => {
     axios
       .delete(
-        `${API_BASE_URL}/Catalogue_api/kategori/${id}/`,
+        `https://django-backend-production-a01f.up.railway.app/Catalogue_api/kategori/${id}/`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -112,7 +111,7 @@ function AdminPage() {
   const handleDeletePesan = (id) => {
     axios
       .delete(
-        `${API_BASE_URL}/Catalogue_api/pesan/${id}/`,
+        `https://django-backend-production-a01f.up.railway.app/Catalogue_api/pesan/${id}/`,
         {
           headers: { Authorization: `Bearer ${token}` },
         },
@@ -191,7 +190,7 @@ function AdminPage() {
     e.preventDefault();
     axios
       .put(
-        `${API_BASE_URL}/Catalogue_api/kategori/${editingCategoryId}/`,
+        `https://django-backend-production-a01f.up.railway.app/Catalogue_api/kategori/${editingCategoryId}/`,
         { nama: editedCategoryName },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -228,7 +227,7 @@ function AdminPage() {
     try {
       // 3. Kirim ke Django (Tanpa perlu upload ke ImgBB dulu)
       await axios.post(
-        `${API_BASE_URL}/Catalogue_api/produk/`,
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/",
         formData,
         {
           headers: {
@@ -260,7 +259,7 @@ function AdminPage() {
     e.preventDefault();
     axios
       .post(
-        `${API_BASE_URL}/Catalogue_api/kategori/`,
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/kategori/",
         { nama: newCategoryName },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -279,7 +278,7 @@ function AdminPage() {
   const handleConfirm = (produkId, pesanId) => {
     axios
       .post(
-        `${API_BASE_URL}/Catalogue_api/konfirmasi-pesanan/${produkId}/${pesanId}`,
+        `https://django-backend-production-a01f.up.railway.app/Catalogue_api/konfirmasi-pesanan/${produkId}/${pesanId}`,
       )
       .then(() => refreshProducts())
       .catch((err) => {

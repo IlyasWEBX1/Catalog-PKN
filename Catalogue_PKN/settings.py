@@ -12,58 +12,34 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
-
-import dj_database_url
 from dotenv import load_dotenv
+import dj_database_url
+load_dotenv()
 
+
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-load_dotenv(BASE_DIR / ".env")
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 
-SECRET_KEY = os.getenv(
-    "SECRET_KEY",
-    "django-insecure-local-development-only"
-)
+SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-dev-key')
 
-DEBUG = os.getenv("DEBUG", "False").lower() == "true"
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost,*').split(',')
 
-def get_env_list(name, default=""):
-    return [
-        item.strip()
-        for item in os.getenv(name, default).split(",")
-        if item.strip()
-    ]
-
-
-ALLOWED_HOSTS = get_env_list(
-    "ALLOWED_HOSTS",
-    "localhost,127.0.0.1"
-)
-
-# Render automatically supplies this variable.
-render_hostname = os.getenv("RENDER_EXTERNAL_HOSTNAME")
-
-if render_hostname and render_hostname not in ALLOWED_HOSTS:
-    ALLOWED_HOSTS.append(render_hostname)
-
-
-CSRF_TRUSTED_ORIGINS = get_env_list(
-    "CSRF_TRUSTED_ORIGINS",
-    "http://localhost:3000,http://127.0.0.1:3000"
-)
-
-CSRF_TRUSTED_ORIGINS = [origin.strip() for origin in os.getenv('CSRF_TRUSTED_ORIGINS', 'https://ac4b58b1-3516-4786-9d16-45bac0c642a5-00-2d5hkcc95h3qq.pike.replit.dev').split(',') if origin.strip()]
+CSRF_TRUSTED_ORIGINS = [
+    'https://django-backend-production-a01f.up.railway.app'
+]
 
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.getenv('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.getenv('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.getenv('CLOUDINARY_API_SECRET'),
+    'CLOUD_NAME': 'duvmajcjo',
+    'API_KEY': '579582195138437',
+    'API_SECRET': 'Sv6gcoG_wHD1aLxS2rL2lJkD1gA', # Secret yang kamu temukan tadi
 }
 
 # Application definition
@@ -86,12 +62,10 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-
-    'corsheaders.middleware.CorsMiddleware',
-
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Keep this 2nd
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
+    'corsheaders.middleware.CorsMiddleware',        # <--- Move this HERE
+    'django.middleware.common.CommonMiddleware',    # <--- Move this BELOW Cors
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
@@ -99,12 +73,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'Catalogue_PKN.urls'
-CORS_ALLOW_ALL_ORIGINS = False
+CORS_ALLOW_ALL_ORIGINS = True  # untuk pengujian lokal
 
-CORS_ALLOWED_ORIGINS = get_env_list(
-    "CORS_ALLOWED_ORIGINS",
-    "http://localhost:3000,http://127.0.0.1:3000"
-)
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -126,46 +97,33 @@ WSGI_APPLICATION = 'Catalogue_PKN.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-# Use DATABASE_URL from the selected PostgreSQL provider (Railway or another host)
+# Use this cleaner pattern to ensure Railway's DATABASE_URL is prioritized
 # settings.py
 import os
 import dj_database_url
 
-# Read DATABASE_URL from deployment environment 
-DATABASE_URL = os.getenv("DATABASE_URL")
+# Ambil dari environment variable Railway 
+DATABASE_URL = os.getenv('DATABASE_URL')
 
 if DATABASE_URL:
+    # JIKA DI RAILWAY: Paksa pakai Postgres
     DATABASES = {
-        "default": dj_database_url.config(
+        'default': dj_database_url.config(
             default=DATABASE_URL,
-            conn_max_age=0,
+            conn_max_age=600,
             conn_health_checks=True,
-            ssl_require=True,
+            ssl_require=True
         )
     }
-
-    # Important when using Neon pooled connections.
-    DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
-
 else:
-    print("Using local SQLite database")
-
+    # JIKA DI LOKAL (tanpa DATABASE_URL): Pakai SQLite
+    print("Database URL tidak ditemukan, menggunakan SQLite...")
     DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-
-STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
-
-    "staticfiles": {
-        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-    },
-}
 
 # tes 123
 # Password validation
@@ -202,20 +160,9 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = "/static/"
-STATIC_ROOT = BASE_DIR / "staticfiles"
-
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
-
-WHITENOISE_USE_FINDERS = True
-WHITENOISE_AUTOREFRESH = DEBUG
-WHITENOISE_MANIFEST_STRICT = False
-
-SECURE_PROXY_SSL_HEADER = (
-    "HTTP_X_FORWARDED_PROTO",
-    "https"
-)
+STATIC_URL = 'static/'
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
@@ -246,13 +193,13 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 WHITENOISE_USE_FINDERS = True
 WHITENOISE_AUTOREFRESH = True
 
-# STORAGES = {
-#     "default": {
-#         "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-#     },
-#     "staticfiles": {
-#         "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
-#     },
-# }
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedStaticFilesStorage",
+    },
+}
 
 WHITENOISE_MANIFEST_STRICT = False

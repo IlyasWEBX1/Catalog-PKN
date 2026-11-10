@@ -1,4 +1,3 @@
-import { API_BASE_URL } from "../config";
 import React, { useState } from "react";
 import axios from "axios";
 function Contact() {
@@ -23,7 +22,7 @@ function Contact() {
 
     try {
       const response = await axios.post(
-        `${API_BASE_URL}/Catalogue_api/pesan/`,
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/pesan/",
         formData,
         {
           headers: {

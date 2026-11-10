@@ -1,4 +1,3 @@
-import { API_BASE_URL } from "../config";
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -15,8 +14,12 @@ function Katalog() {
   useEffect(() => {
     setLoading(true);
     Promise.all([
-      axios.get(`${API_BASE_URL}/Catalogue_api/produk/`),
-      axios.get(`${API_BASE_URL}/Catalogue_api/kategori/`),
+      axios.get(
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/",
+      ),
+      axios.get(
+        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/kategori/",
+      ),
     ])
       .then(([produkResponse, kategoriResponse]) => {
         setProducts(produkResponse.data);

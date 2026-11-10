@@ -1,4 +1,3 @@
-import { API_BASE_URL } from "../config";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -64,7 +63,7 @@ function HybridCarousel({ items, basis }) {
                     src={
                       item.gambar.startsWith("http")
                         ? item.gambar
-                        : `${API_BASE_URL}/${item.gambar}`
+                        : `https://django-backend-production-a01f.up.railway.app/${item.gambar}`
                     }
                     alt={item.nama}
                     className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-110"
