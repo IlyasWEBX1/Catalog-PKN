@@ -1,0 +1,24 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Database
+*.sqlite3
+*.db
+
+# Node.js
+node_modules/
+
+# Media and generated files
+media/
+staticfiles/
+
+# Virtual environments
+venv/
+.venv/
