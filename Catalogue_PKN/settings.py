@@ -89,8 +89,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'Catalogue_PKN.urls'
-CORS_ALLOW_ALL_ORIGINS = True  # untuk pengujian lokal
+ROOT_URLCONF = 'Catalogue_PKN.urls'# untuk pengujian lokal
 
 
 TEMPLATES = [
