@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import axios from "axios";
@@ -29,10 +30,10 @@ function Home() {
   useEffect(() => {
     Promise.all([
       axios.get(
-        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/",
+        `${API_BASE_URL}/Catalogue_api/produk/`,
       ),
       axios.get(
-        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/kategori/",
+        `${API_BASE_URL}/Catalogue_api/kategori/`,
       ),
     ])
       .then(([response, response2]) => {

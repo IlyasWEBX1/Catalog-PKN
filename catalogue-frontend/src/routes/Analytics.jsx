@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useEffect, useState, useMemo } from "react";
 import axios from "axios";
 import AdminDashboard from "../components/AdminMenu";
@@ -128,23 +129,23 @@ const Analytics = () => {
 
     Promise.all([
       axios.get(
-        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/analytics/produk-terlaris/",
+        `${API_BASE_URL}/Catalogue_api/analytics/produk-terlaris/`,
         params,
       ),
       axios.get(
-        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/analytics/kategori/",
+        `${API_BASE_URL}/Catalogue_api/analytics/kategori/`,
         params,
       ),
       axios.get(
-        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/analytics/overview/",
+        `${API_BASE_URL}/Catalogue_api/analytics/overview/`,
         params,
       ),
       axios.get(
-        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/analytics/product-multiline/",
+        `${API_BASE_URL}/Catalogue_api/analytics/product-multiline/`,
         params,
       ),
       axios.get(
-        "https://django-backend-production-a01f.up.railway.app/Catalogue_api/analytics/pendapatan-terbanyak/",
+        `${API_BASE_URL}/Catalogue_api/analytics/pendapatan-terbanyak/`,
         params,
       ),
     ])

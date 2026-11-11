@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -35,11 +36,11 @@ const ProductConfiguration = () => {
         const headers = { Authorization: `Bearer ${token}` };
         const [prodRes, perfRes] = await Promise.all([
           axios.get(
-            `https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/configuration/${id}/`,
+            `${API_BASE_URL}/Catalogue_api/produk/configuration/${id}/`,
             { headers },
           ),
           axios.get(
-            `https://django-backend-production-a01f.up.railway.app/Catalogue_api/produk/configuration/${id}/performance/`,
+            `${API_BASE_URL}/Catalogue_api/produk/configuration/${id}/performance/`,
             { headers },
           ),
         ]);

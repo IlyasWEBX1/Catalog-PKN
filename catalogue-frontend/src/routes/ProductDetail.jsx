@@ -1,3 +1,4 @@
+import { API_BASE_URL } from "../config";
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link, Navigate } from "react-router-dom";
 import axios from "axios";
@@ -9,8 +10,7 @@ import ItemCarousel from "../components/slider";
 import ItemCarousel2 from "../components/slider2";
 import HybridCarousel from "../components/slider3";
 
-const API_BASE =
-  "https://django-backend-production-a01f.up.railway.app/Catalogue_api";
+const API_BASE = `${API_BASE_URL}/Catalogue_api`;
 
 function ProductDetail() {
   const { id } = useParams();

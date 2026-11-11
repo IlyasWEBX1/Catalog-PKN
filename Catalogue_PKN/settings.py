@@ -14,32 +14,49 @@ from pathlib import Path
 from datetime import timedelta
 from dotenv import load_dotenv
 import dj_database_url
-load_dotenv()
 
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+load_dotenv(BASE_DIR / ".env")
 
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
+SECRET_KEY = os.getenv(
+    "SECRET_KEY",
+    "django-insecure-local-development-only"
+)
 
-# SECURITY WARNING: keep the secret key used in production secret!
+DEBUG = os.getenv("DEBUG", "True").lower() == "true"
 
-SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-default-dev-key')
-
-DEBUG = os.getenv('DEBUG', 'True') == 'True'
-
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost,*').split(',')
-
-CSRF_TRUSTED_ORIGINS = [
-    'https://django-backend-production-a01f.up.railway.app'
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in os.getenv(
+        "ALLOWED_HOSTS",
+        "localhost,127.0.0.1"
+    ).split(",")
+    if host.strip()
 ]
 
+
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv("CSRF_TRUSTED_ORIGINS", "").split(",")
+    if origin.strip()
+]
+
+CORS_ALLOWED_ORIGINS = [
+    origin.strip()
+    for origin in os.getenv(
+        "CORS_ALLOWED_ORIGINS",
+        "http://localhost:3000,http://127.0.0.1:3000"
+    ).split(",")
+    if origin.strip()
+]
+
+CORS_ALLOW_ALL_ORIGINS = False
+
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'duvmajcjo',
-    'API_KEY': '579582195138437',
-    'API_SECRET': 'Sv6gcoG_wHD1aLxS2rL2lJkD1gA', # Secret yang kamu temukan tadi
+    "CLOUD_NAME": os.getenv("CLOUDINARY_CLOUD_NAME"),
+    "API_KEY": os.getenv("CLOUDINARY_API_KEY"),
+    "API_SECRET": os.getenv("CLOUDINARY_API_SECRET"),
 }
 
 # Application definition
@@ -103,28 +120,28 @@ import os
 import dj_database_url
 
 # Ambil dari environment variable Railway 
-DATABASE_URL = os.getenv('DATABASE_URL')
+DATABASE_URL = os.getenv("DATABASE_URL")
 
 if DATABASE_URL:
-    # JIKA DI RAILWAY: Paksa pakai Postgres
     DATABASES = {
-        'default': dj_database_url.config(
+        "default": dj_database_url.config(
             default=DATABASE_URL,
-            conn_max_age=600,
+            conn_max_age=0,
             conn_health_checks=True,
-            ssl_require=True
+            ssl_require=True,
         )
     }
-else:
-    # JIKA DI LOKAL (tanpa DATABASE_URL): Pakai SQLite
-    print("Database URL tidak ditemukan, menggunakan SQLite...")
+elif DEBUG:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
+else:
+    raise ValueError("DATABASE_URL wajib diatur untuk production.")
 
+DATABASES["default"]["DISABLE_SERVER_SIDE_CURSORS"] = True
 # tes 123
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -183,9 +200,6 @@ SIMPLE_JWT = {
     'AUTH_HEADER_TYPES': ('Bearer',),
 }
 AUTH_USER_MODEL = 'Catalogue.User'  # Replace 'yourapp' with your app name
-
-print(MEDIA_ROOT)
-print(MEDIA_URL)
 
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
